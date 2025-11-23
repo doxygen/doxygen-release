@@ -906,8 +906,8 @@ jobs:
     - name: Download htmlhelp (Windows)
       if: matrix.platform == 'windows'
       run: |
-        # curl -L -o htmlhelp.exe http://web.archive.org/web/20160201063255/http://download.microsoft.com/download/0/A/9/0A939EF6-E31C-430F-A3DF-DFAE7960D564/htmlhelp.exe
-        ./htmlhelp.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+        # curl -L -o windows/htmlhelp.exe http://web.archive.org/web/20160201063255/http://download.microsoft.com/download/0/A/9/0A939EF6-E31C-430F-A3DF-DFAE7960D564/htmlhelp.exe
+        ./windows/htmlhelp.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
       shell: pwsh
 
     - name: Verify hhc.exe is installed
@@ -1290,7 +1290,7 @@ jobs:
         editbin R:\doxygen-install\bin\doxyindexer.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
         editbin R:\doxygen-install\bin\doxysearch.cgi.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
         Write-Host "Using version: '${{ steps.doxygen-version.outputs.version }}'"
-        (Get-Content .\doxygen.iss -Raw) -replace '\$VERSION','${{ steps.doxygen-version.outputs.version }}' | Set-Content -Encoding ASCII .\doxygen-versioned.iss
+        (Get-Content .\windows\doxygen.iss -Raw) -replace '\$VERSION','${{ steps.doxygen-version.outputs.version }}' | Set-Content -Encoding ASCII .\doxygen-versioned.iss
         # invoke the inno setup compiler
         $iscc = Get-Command ISCC.exe -ErrorAction SilentlyContinue
         if (-not $iscc) {
