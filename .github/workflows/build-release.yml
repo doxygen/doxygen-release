@@ -1335,6 +1335,13 @@ jobs:
         hdiutil convert -format UDCO -o installer/Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg macosx/template.sparseimage
         xattr -c installer/Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg
 
+        # create zip with binaries
+        mkdir -p doxygen-${{ steps.doxygen-version.outputs.version }}
+        cp doxygen/build/bin/doxygen        doxygen-${{ steps.doxygen-version.outputs.version }}
+        cp doxygen/build/bin/doxyindexer    doxygen-${{ steps.doxygen-version.outputs.version }}
+        cp doxygen/build/bin/doxysearch.cgi doxygen-${{ steps.doxygen-version.outputs.version }}
+        zip -r installer/doxygen-${{ steps.doxygen-version.outputs.version }}-mac-${{ matrix.cpu }}.zip doxygen-${{ steps.doxygen-version.outputs.version }}
+        
       shell: bash
 
     - name: Create installer (Linux)
@@ -1406,6 +1413,13 @@ jobs:
       with:
         name: Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg
         path: installer/Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg
+
+    - name: Upload Doxygen build (macOS/doxygen-mac.zip)
+      if: matrix.platform == 'macos'
+      uses: actions/upload-artifact@v4
+      with:
+        name: doxygen-${{ steps.doxygen-version.outputs.version }}-mac-${{ matrix.cpu }}.zip
+        path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}-mac-${{ matrix.cpu }}.zip
 
     - name: Upload Doxygen build (Linux/doxygen.src.tar.gz)
       if: matrix.platform == 'linux'
