@@ -582,6 +582,7 @@ jobs:
       if: matrix.platform == 'macos'
       run: |
         brew install cmake ninja
+        which ninja
       shell: bash
 
 #------------------------------------- determine Qt6 version to use
