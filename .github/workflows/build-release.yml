@@ -367,15 +367,15 @@ jobs:
 
 #------------------------------------- download Xapian sources to build
 
-      - name: Cache Xapian source
-        id: cache-xapian-source
-        uses: actions/cache@v4
-        with:
-          path: xapian
-          key: xapian-core-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}.tar.xz
+      #- name: Cache Xapian source
+      #  id: cache-xapian-source
+      #  uses: actions/cache@v4
+      #  with:
+      #    path: xapian
+      #    key: xapian-core-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}.tar.xz
 
       - name: Download Xapian source code
-        if: steps.cache-xapian-source.outputs.cache-hit != 'true'
+        #if: steps.cache-xapian-source.outputs.cache-hit != 'true'
         run: |
           VERSION="${{ steps.xapian-version.outputs.version }}"
           echo "Downloading Xapian $VERSION"
@@ -599,15 +599,15 @@ jobs:
 
 #------------------------------------- download Qt6 sources
 
-    - name: Cache Qt6 source
-      id: cache-qt6-source
-      uses: actions/cache@v4
-      with:
-        path: qt6-source
-        key: qt6-source-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}
+    #- name: Cache Qt6 source
+    #  id: cache-qt6-source
+    #  uses: actions/cache@v4
+    #  with:
+    #    path: qt6-source
+    #    key: qt6-source-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}
 
     - name: Download Qt6 source code
-      if: steps.cache-qt6-source.outputs.cache-hit != 'true'
+      #if: steps.cache-qt6-source.outputs.cache-hit != 'true'
       run: |
         echo "Downloading Qt6 ${{ steps.qt6-version.outputs.version }}"
         VERSION="${{ steps.qt6-version.outputs.version }}"
