@@ -250,7 +250,7 @@ jobs:
 #------------------------------------- upload LLVM artifacts
 
     - name: Upload LLVM static build
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: llvm-static-${{ steps.llvm-version.outputs.version }}-${{ matrix.os }}
         path: llvm-static-${{ steps.llvm-version.outputs.version }}-${{ matrix.os }}.${{ matrix.archive_format }}
@@ -485,7 +485,7 @@ jobs:
 #------------------------------------- upload Xapian build artifacts
 
       - name: Upload Xapian static build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}
           path: xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}.${{ matrix.archive_format }}
@@ -716,7 +716,7 @@ jobs:
 #------------------------------------- upload the Qt6 build artifacts
 
     - name: Upload Qt6 static build
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}
         path: qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}.${{ matrix.archive_format }}
@@ -1033,12 +1033,10 @@ jobs:
       shell: bash
 
     - name: Download LLVM artifacts
-      uses: dawidd6/action-download-artifact@v11
+      uses: actions/download-artifact@v7
       with:
-        workflow: build-llvm.yml
         name: llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}
         path: llvm-artifact
-        skip_unpack: false
 
     #- name: Extract LLVM version from artifact
     #  id: llvm-version
@@ -1073,13 +1071,10 @@ jobs:
 #------------------------------------- prepare Qt dependency
 
     - name: Download Qt6 artifacts
-      uses: dawidd6/action-download-artifact@v11
+      uses: actions/download-artifact@v7
       with:
-        workflow: build-qt6.yml
-        name: qt6-static-.*-${{ matrix.os }}
-        name_is_regexp: true
+        name: qt6-static-6.10.0-${{ matrix.os }}
         path: qt6-artifact
-        skip_unpack: false
 
     - name: Extract Qt6 version from artifact
       id: qt6-version
@@ -1112,13 +1107,10 @@ jobs:
 #------------------------------------- prepare Xapian dependency
 
     - name: Download Xapian artifacts
-      uses: dawidd6/action-download-artifact@v11
+      uses: actions/download-artifact@v7
       with:
-        workflow: build-xapian.yml
-        name: xapian-static-.*-${{ matrix.os }}
-        name_is_regexp: true
+        name: xapian-static-1.4.29-${{ matrix.os }}
         path: xapian-artifact
-        skip_unpack: false
 
     - name: Extract Xapian version from artifact
       id: xapian-version
@@ -1399,56 +1391,56 @@ jobs:
 
     - name: Upload Doxygen build (Windows/setup.exe)
       if: matrix.platform == 'windows'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: doxygen-${{ steps.doxygen-version.outputs.version }}-setup.exe
         path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}-setup.exe
 
     - name: Upload Doxygen build (Windows/doxygen-x64.zip)
       if: matrix.platform == 'windows'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: doxygen-${{ steps.doxygen-version.outputs.version }}.x64.bin.zip
         path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}.x64.bin.zip
 
     - name: Upload Doxygen build (Windows/doxygen_manual.chm)
       if: matrix.platform == 'windows'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: doxygen_manual-${{ steps.doxygen-version.outputs.version }}.chm.zip
         path: installer/doxygen_manual-${{ steps.doxygen-version.outputs.version }}.chm.zip
 
     - name: Upload Doxygen build (macOS/doxygen.dmg)
       if: matrix.platform == 'macos'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg
         path: installer/Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg
 
     - name: Upload Doxygen build (macOS/doxygen-mac.zip)
       if: matrix.platform == 'macos'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: doxygen-${{ steps.doxygen-version.outputs.version }}-mac-${{ matrix.cpu }}.zip
         path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}-mac-${{ matrix.cpu }}.zip
 
     - name: Upload Doxygen build (Linux/doxygen.src.tar.gz)
       if: matrix.platform == 'linux'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: doxygen-${{ steps.doxygen-version.outputs.version }}.src.tar.gz
         path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}.src.tar.gz
 
     - name: Upload Doxygen build (Linux/doxygen.linux.bin.tar.gz)
       if: matrix.platform == 'linux'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: doxygen-${{ steps.doxygen-version.outputs.version }}.linux.bin.tar.gz
         path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}.linux.bin.tar.gz
 
     - name: Upload Doxygen build (Linux/doxygen_manual.pdf.zip)
       if: matrix.platform == 'linux'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: doxygen_manual-${{ steps.doxygen-version.outputs.version }}.pdf.zip
         path: installer/doxygen_manual-${{ steps.doxygen-version.outputs.version }}.pdf.zip
