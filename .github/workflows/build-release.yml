@@ -116,9 +116,9 @@ jobs:
         #    fi
 
         #    echo "Latest LLVM release: $LATEST_TAG"
-        #    echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
-        #    VERSION=${LATEST_TAG#llvmorg-}
-        VERSION="21.1.5"
+        LATEST_TAG="llvmorg-21.1.5"
+        echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+        VERSION=${LATEST_TAG#llvmorg-}
         echo "version=$VERSION" >> $GITHUB_OUTPUT
       shell: bash
 
