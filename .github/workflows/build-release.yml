@@ -1021,44 +1021,6 @@ jobs:
 
 #------------------------------------- prepare libclang dependency
 
-    - name: Get latest LLVM release tag to download
-      id: llvm-version
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -euo pipefail
-        echo "GITHUB_TOKEN present: ${GITHUB_TOKEN:+yes}"
-        # Retry loop with exponential backoff
-        attempts=5
-        sleep_for=2
-        for i in $(seq 1 $attempts); do
-          echo "Attempt $i..."
-          resp=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/llvm/llvm-project/releases/latest" ) || true
-          http_code=$(echo "$resp" | jq -r '. | if has("message") then "error" else "ok" end')
-          tag=$(echo "$resp" | jq -r '.tag_name // empty')
-          if [ -n "$tag" ]; then
-            LATEST_TAG="$tag"
-            break
-          fi
-          echo "No tag found. API response (truncated):"
-          echo "$resp" | jq -C '.' | sed -n '1,200p'
-          echo "Sleeping $sleep_for seconds before retry..."
-          sleep $sleep_for
-          sleep_for=$((sleep_for * 2))
-        done
-
-        if [ -z "${LATEST_TAG:-}" ]; then
-          echo "Error: Could not fetch LLVM release tag; last response:"
-          echo "$resp" | jq -C '.' || echo "$resp"
-          exit 1
-        fi
-
-        echo "Latest LLVM release: $LATEST_TAG"
-        echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
-        VERSION=${LATEST_TAG#llvmorg-}
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-      shell: bash
-
     - name: Download LLVM artifacts
       uses: dawidd6/action-download-artifact@v11
       with:
