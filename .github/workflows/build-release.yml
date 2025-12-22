@@ -1052,7 +1052,11 @@ jobs:
       if: matrix.platform != 'windows'
       run: |
         mkdir -p llvm-install
-        cd llvm-artifact/llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}
+        ls llvm-artifact
+        cd llvm-artifact
+        unzip llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}.zip
+        ls .
+        cd    llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}
         # Extract the tar.gz archive to the install directory
         tar -xzf llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}.tar.gz -C ../../llvm-install
       shell: bash
@@ -1061,8 +1065,11 @@ jobs:
       if: matrix.platform == 'windows'
       run: |
         mkdir llvm-install
+        dir llvm-artifact
+        Expand-Archive -Path "llvm-artifact/llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "llvm-artifact"
+        cd llvm-artifact
         dir
-        cd llvm-artifact\llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}
+        cd llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}
         dir
         # Extract the zip archive to the install directory
         Expand-Archive -Path "llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "../../llvm-install"
@@ -1090,7 +1097,9 @@ jobs:
       if: matrix.platform != 'windows'
       run: |
         mkdir -p qt6-install
-        cd qt6-artifact/qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}
+        cd qt6-artifact
+        unzip qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}.zip
+        cd qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}
         # Extract the tar.gz archive to the install directory
         tar -xzf qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}.tar.gz -C ../../qt6-install
       shell: bash
@@ -1098,8 +1107,11 @@ jobs:
     - name: Extract Qt6 artifacts (Windows)
       if: matrix.platform == 'windows'
       run: |
+        dir qt6-artifact
+        Expand-Archive -Path "qt6-artifact/qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "qt6-artifact"
         mkdir qt6-install
         cd qt6-artifact\qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}
+        dir
         # Extract the zip archive to the install directory
         Expand-Archive -Path "qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "../../qt6-install"
       shell: pwsh
@@ -1126,7 +1138,9 @@ jobs:
       if: matrix.platform != 'windows'
       run: |
         mkdir -p xapian-install
-        cd xapian-artifact/xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}
+        cd xapian-artifact
+        unzip xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}.zip
+        cd xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}
         # Extract the tar.gz archive to the install directory
         tar -xzf xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}.tar.gz -C ../../xapian-install
       shell: bash
@@ -1134,6 +1148,8 @@ jobs:
     - name: Extract Xapian artifacts (Windows)
       if: matrix.platform == 'windows'
       run: |
+        dir xapian-artifact
+        Expand-Archive -Path "xapian-artifact/xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "xapian-artifact"
         mkdir xapian-install
         cd xapian-artifact\xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}
         # Extract the zip archive to the install directory
@@ -1344,7 +1360,7 @@ jobs:
         cp doxygen/build/bin/doxyindexer    doxygen-${{ steps.doxygen-version.outputs.version }}
         cp doxygen/build/bin/doxysearch.cgi doxygen-${{ steps.doxygen-version.outputs.version }}
         zip -r installer/doxygen-${{ steps.doxygen-version.outputs.version }}-mac-${{ matrix.cpu }}.zip doxygen-${{ steps.doxygen-version.outputs.version }}
-        
+
       shell: bash
 
     - name: Create installer (Linux)
