@@ -1022,43 +1022,30 @@ jobs:
 
 #------------------------------------- prepare libclang dependency
 #
-    - name: Get latest LLVM release tag for download
-      id: llvm-version-download
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -euo pipefail
-        VERSION="21.1.5"
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-      shell: bash
-
     - name: Download LLVM artifacts
       uses: actions/download-artifact@v7
       with:
-        name: llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}
+        name: llvm-static-21.1.5-${{ matrix.os }}
         path: llvm-artifact
 
-    #- name: Extract LLVM version from artifact
-    #  id: llvm-version
-    #  run: |
-    #    cd llvm-artifact
-    #    FILENAME=$(ls llvm-static-* | head -1)
-    #    VERSION=$(echo "$FILENAME" | sed -E 's/llvm-static-(.+)-${{ matrix.os }}.*/\1/')
-    #    echo "version=$VERSION" >> $GITHUB_OUTPUT
-    #    echo "LLVM version from artifact: $VERSION"
-    #  shell: bash
+    - name: Extract LLVM version from artifact
+      id: llvm-version
+      run: |
+        cd llvm-artifact
+        FILENAME=$(ls llvm-static-* | head -1)
+        VERSION=$(echo "$FILENAME" | sed -E 's/llvm-static-(.+)-${{ matrix.os }}.*/\1/')
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "LLVM version from artifact: $VERSION"
+      shell: bash
 
     - name: Extract LLVM artifacts (Linux/macOS)
       if: matrix.platform != 'windows'
       run: |
         mkdir -p llvm-install
         ls llvm-artifact
-        cd llvm-artifact
-        unzip llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}.zip
-        ls .
-        cd    llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}
         # Extract the tar.gz archive to the install directory
-        tar -xzf llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}.tar.gz -C ../../llvm-install
+        tar -xzf llvm-artifact/llvm-static-${{ steps.llvm-version.outputs.version }}-${{ matrix.os }}.tar.gz -C llvm-install
+        ls llvm-install
       shell: bash
 
     - name: Extract LLVM artifacts (Windows)
@@ -1066,13 +1053,8 @@ jobs:
       run: |
         mkdir llvm-install
         dir llvm-artifact
-        Expand-Archive -Path "llvm-artifact/llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "llvm-artifact"
-        cd llvm-artifact
-        dir
-        cd llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}
-        dir
-        # Extract the zip archive to the install directory
-        Expand-Archive -Path "llvm-static-${{ steps.llvm-version-download.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "../../llvm-install"
+        Expand-Archive -Path "llvm-artifact/llvm-static-${{ steps.llvm-version.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "llvm-install"
+        dir llvm-install
       shell: pwsh
 
 #------------------------------------- prepare Qt dependency
@@ -1097,23 +1079,19 @@ jobs:
       if: matrix.platform != 'windows'
       run: |
         mkdir -p qt6-install
-        cd qt6-artifact
-        unzip qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}.zip
-        cd qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}
+        ls qt6-artifact
         # Extract the tar.gz archive to the install directory
-        tar -xzf qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}.tar.gz -C ../../qt6-install
+        tar -xzf qt6-artifact/qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}.tar.gz -C qt6-install
+        ls qt6-install
       shell: bash
 
     - name: Extract Qt6 artifacts (Windows)
       if: matrix.platform == 'windows'
       run: |
-        dir qt6-artifact
-        Expand-Archive -Path "qt6-artifact/qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "qt6-artifact"
         mkdir qt6-install
-        cd qt6-artifact\qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}
-        dir
-        # Extract the zip archive to the install directory
-        Expand-Archive -Path "qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "../../qt6-install"
+        dir qt6-artifact
+        Expand-Archive -Path "qt6-artifact/qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "qt6-install"
+        dir qt6-install
       shell: pwsh
 
 #------------------------------------- prepare Xapian dependency
@@ -1138,22 +1116,19 @@ jobs:
       if: matrix.platform != 'windows'
       run: |
         mkdir -p xapian-install
-        cd xapian-artifact
-        unzip xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}.zip
-        cd xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}
+        ls xapian-artifact
         # Extract the tar.gz archive to the install directory
-        tar -xzf xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}.tar.gz -C ../../xapian-install
+        tar -xzf xapian-artifact/xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}.tar.gz -C xapian-install
+        ls xapian-install
       shell: bash
 
     - name: Extract Xapian artifacts (Windows)
       if: matrix.platform == 'windows'
       run: |
-        dir xapian-artifact
-        Expand-Archive -Path "xapian-artifact/xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "xapian-artifact"
         mkdir xapian-install
-        cd xapian-artifact\xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}
-        # Extract the zip archive to the install directory
-        Expand-Archive -Path "xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "../../xapian-install"
+        dir xapian-artifact
+        Expand-Archive -Path "xapian-artifact/xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}.zip" -DestinationPath "xapian-install"
+        dir xapian-install
       shell: pwsh
 
 #------------------------------------- configure build
