@@ -3,15 +3,19 @@
 <plist version="1.0">
 <dict>
         <key>CFBundleIdentifier</key>
-        <string>org.doxygen</string>
+        <string>nl.doxygen.Doxygen</string>
 	<key>CFBundleIconFile</key>
 	<string>Doxygen.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
         <key>CFBundleGetInfoString</key>
-	<string>$VERSION, Copyright (c) 1997-2020 by Dimitri van Heesch</string>
+	<string>$VERSION, Copyright (c) 1997-2026, Dimitri van Heesch</string>
 	<key>CFBundleSignature</key>
 	<string>Doxy</string>
+        <key>CFBundleDisplayName</key>
+        <string>Doxygen</string>
+        <key>NSHumanReadableCopyright</key>
+        <string>(c) 1997-2026, Dimitri van Heesch</string>
 	<key>CFBundleExecutable</key>
 	<string>Doxywizard</string>
         <key>CFBundleShortVersionString</key>
