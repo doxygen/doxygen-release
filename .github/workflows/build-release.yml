@@ -89,33 +89,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         set -euo pipefail
-        #    echo "GITHUB_TOKEN present: ${GITHUB_TOKEN:+yes}"
-        #    # Retry loop with exponential backoff
-        #    attempts=5
-        #    sleep_for=2
-        #    for i in $(seq 1 $attempts); do
-        #      echo "Attempt $i..."
-        #      resp=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/llvm/llvm-project/releases/latest" ) || true
-        #      http_code=$(echo "$resp" | jq -r '. | if has("message") then "error" else "ok" end')
-        #      tag=$(echo "$resp" | jq -r '.tag_name // empty')
-        #      if [ -n "$tag" ]; then
-        #        LATEST_TAG="$tag"
-        #        break
-        #      fi
-        #      echo "No tag found. API response (truncated):"
-        #      echo "$resp" | jq -C '.' | sed -n '1,200p'
-        #      echo "Sleeping $sleep_for seconds before retry..."
-        #      sleep $sleep_for
-        #      sleep_for=$((sleep_for * 2))
-        #    done
-
-        #    if [ -z "${LATEST_TAG:-}" ]; then
-        #      echo "Error: Could not fetch LLVM release tag; last response:"
-        #      echo "$resp" | jq -C '.' || echo "$resp"
-        #      exit 1
-        #    fi
-
-        #    echo "Latest LLVM release: $LATEST_TAG"
         LATEST_TAG="llvmorg-21.1.5"
         echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
         VERSION=${LATEST_TAG#llvmorg-}
@@ -752,7 +725,7 @@ jobs:
             cpu: intel
             platform: macos
             extension: ""
-            archive_format: tar.gz    
+            archive_format: tar.gz
 
     steps:
     - name: Checkout repository
@@ -967,24 +940,9 @@ jobs:
       run: |
         set -euo pipefail
         echo "GITHUB_TOKEN present: ${GITHUB_TOKEN:+yes}"
-        # Retry loop with exponential backoff
-        attempts=5
-        sleep_for=2
-        for i in $(seq 1 $attempts); do
-          echo "Attempt $i..."
-          resp=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/doxygen/doxygen/releases/latest" ) || true
-          http_code=$(echo "$resp" | jq -r '. | if has("message") then "error" else "ok" end')
-          tag=$(echo "$resp" | jq -r '.tag_name // empty')
-          if [ -n "$tag" ]; then
-            LATEST_TAG="$tag"
-            break
-          fi
-          echo "No tag found. API response (truncated):"
-          echo "$resp" | jq -C '.' | sed -n '1,200p'
-          echo "Sleeping $sleep_for seconds before retry..."
-          sleep $sleep_for
-          sleep_for=$((sleep_for * 2))
-        done
+        resp=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/doxygen/doxygen/tags" ) || true
+        tag=$(echo "$resp" | jq -r '.[0].name // empty')
+        LATEST_TAG="$tag"
 
         if [ -z "${LATEST_TAG:-}" ]; then
           echo "Error: Could not fetch Doxygen release tag; last response:"
@@ -992,7 +950,7 @@ jobs:
           exit 1
         fi
 
-        echo "Latest Doxygen release: $LATEST_TAG"
+        echo "Latest Doxygen tag: $LATEST_TAG"
         echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
         # Remove leading 'Release_' prefix if present
         VERSION=${LATEST_TAG#Release_}
@@ -1008,10 +966,10 @@ jobs:
         echo "Downloading Doxygen ${{ steps.doxygen-version.outputs.tag }}"
 
         # download specific tag
-        #git clone --depth 1 --branch ${{ steps.doxygen-version.outputs.tag }} https://github.com/doxygen/doxygen.git
+        git clone --depth 1 --branch ${{ steps.doxygen-version.outputs.tag }} https://github.com/doxygen/doxygen.git
 
         # alternatively use latest master
-        git clone --depth 1 --branch master https://github.com/doxygen/doxygen.git
+        #git clone --depth 1 --branch master https://github.com/doxygen/doxygen.git
 
         if [ ! -d "doxygen" ]; then
           echo "Error: Doxygen source download failed or directory structure is incorrect"
