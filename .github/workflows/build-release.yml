@@ -133,7 +133,6 @@ jobs:
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
           -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/llvm-install \
           -DLLVM_ENABLE_PROJECTS="clang;lld" \
-          -DLIBCLANG_BUILD_STATIC=ON \
           -DLLVM_ENABLE_OCAMLDOC=OFF \
           -DLLVM_ENABLE_LTO=OFF \
           -DLLVM_ENABLE_WARNINGS=OFF \
@@ -148,6 +147,9 @@ jobs:
           -DLLVM_INCLUDE_EXAMPLES=OFF \
           -DLLVM_TOOL_REMARKS_SHLIB_BUILD=OFF \
           -DLLVM_PARALLEL_LINK_JOBS=1 \
+          -DLLVM_LINK_LLVM_DYLIB=OFF \
+          -DLIBCLANG_BUILD_STATIC=ON \
+          -DCLANG_LINK_CLANG_DYLIB=OFF \
           ${{ matrix.cmake_args }}
           cmake --build . --parallel 2
           cmake --install .
