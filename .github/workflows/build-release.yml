@@ -1008,6 +1008,20 @@ jobs:
         ls llvm-install
       shell: bash
 
+    - name: Remove dynamic library (MacOS)
+      if: matrix.platform == 'macosx'
+      run: |
+        rm llvm-install/lib/libclang.dylib
+        rm llvm-install/lib/libclang-cpp.dylib
+      shell: bash
+
+    - name: Remove dynamic library (Linux)
+      if: matrix.platform == 'linux'
+      run: |
+        rm llvm-install/lib/libclang.so
+        rm llvm-install/lib/libclang-cpp.so
+      shell: bash
+
     - name: Extract LLVM artifacts (Windows)
       if: matrix.platform == 'windows'
       run: |
