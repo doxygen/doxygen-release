@@ -975,10 +975,10 @@ jobs:
         echo "Downloading Doxygen ${{ steps.doxygen-version.outputs.tag }}"
 
         # download specific tag
-        git clone --depth 1 --branch ${{ steps.doxygen-version.outputs.tag }} https://github.com/doxygen/doxygen.git
+        #git clone --depth 1 --branch ${{ steps.doxygen-version.outputs.tag }} https://github.com/doxygen/doxygen.git
 
         # alternatively use latest master
-        #git clone --depth 1 --branch master https://github.com/doxygen/doxygen.git
+        git clone --depth 1 --branch master https://github.com/doxygen/doxygen.git
 
         if [ ! -d "doxygen" ]; then
           echo "Error: Doxygen source download failed or directory structure is incorrect"
