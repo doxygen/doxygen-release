@@ -1308,17 +1308,16 @@ jobs:
         VERSION=${{ steps.doxygen-version.outputs.version }}
 
         # create installer dir
-        mkdir -p installer
+        mkdir -p installer/doxygen-$VERSION
 
         # create source package
         tar -C doxygen --exclude bin -c -v -f doxygen-$VERSION.src.tar.gz \
           doc doc_internal deps vhdlparser libxml libversion examples addon src testing templates cmake \
           CMakeLists.txt BUILD.txt INSTALL LANGUAGE.HOWTO LICENSE README.md VERSION
-        mkdir install/doxygen-$VERSION
-        cd install/doxygen-$VERSION
-        tar zxvf ../../doxygen-$VERSION.src.tar.gz
+        cd installer/doxygen-$VERSION
+        tar zxf ../../doxygen-$VERSION.src.tar.gz
         cd ..
-        tar zcvf doxygen-$VERSION.src.tar.gz doxygen-$VERSION
+        tar zcf doxygen-$VERSION.src.tar.gz doxygen-$VERSION
         rm -rf doxygen-$VERSION
         cd ..
 
