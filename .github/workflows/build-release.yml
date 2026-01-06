@@ -1311,13 +1311,13 @@ jobs:
         mkdir -p installer/doxygen-$VERSION
 
         # create source package
-        tar -C doxygen --exclude bin -c -v -f doxygen-$VERSION.src.tar.gz \
+        tar -C doxygen --exclude bin -c -f doxygen-$VERSION.src.tar \
           doc doc_internal deps vhdlparser libxml libversion examples addon src testing templates cmake \
           CMakeLists.txt BUILD.txt INSTALL LANGUAGE.HOWTO LICENSE README.md VERSION
         cd installer/doxygen-$VERSION
-        tar zxf ../../doxygen-$VERSION.src.tar.gz
+        tar xf ../../doxygen-$VERSION.src.tar
         cd ..
-        tar zcf doxygen-$VERSION.src.tar.gz doxygen-$VERSION
+        tar zcvf doxygen-$VERSION.src.tar.gz doxygen-$VERSION
         rm -rf doxygen-$VERSION
         cd ..
 
