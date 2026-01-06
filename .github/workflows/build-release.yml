@@ -8,6 +8,10 @@ permissions:
 
 env:
   BUILD_TYPE: Release
+  LLVM_VERSION: 21.1.5
+  XAPIAN_VERSION: 1.4.29
+  QT6_VERSION: 6.10.0
+  ZLIB_VERSION: 1.3.1
 
 jobs:
 
@@ -89,7 +93,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         set -euo pipefail
-        LATEST_TAG="llvmorg-21.1.5"
+        LATEST_TAG="llvmorg-${{ env.LLVM_VERSION }}"
         echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
         VERSION=${LATEST_TAG#llvmorg-}
         echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -299,14 +303,14 @@ jobs:
       - name: Download zlib (Windows)
         if: matrix.platform == 'windows'
         run: |
-          curl -L -o zlib.tgz https://zlib.net/zlib-1.3.1.tar.gz
+          curl -L -o zlib.tgz https://zlib.net/zlib-${{ env.ZLIB_VERSION }}.tar.gz
           tar zxvf zlib.tgz
 
       - name: Build zlib (Windows)
         if: matrix.platform == 'windows'
         shell: cmd
         run: |
-          cd zlib-1.3.1
+          cd zlib-${{ env.ZLIB_VERSION }}
           @rem nmake -f win32\Makefile.msc LOC="-MT" all
           nmake -f win32\Makefile.msc LOC="-MT" zlib.lib
 
@@ -336,7 +340,7 @@ jobs:
       - name: Get latest Xapian stable release tag
         id: xapian-version
         run: |
-          VERSION="1.4.29"
+          VERSION="${{ env.XAPIAN_VERSION }}"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
         shell: bash
@@ -392,8 +396,8 @@ jobs:
           export AR="lib"
           export LD="link"
           export NM="dumpbin"
-          export CPPFLAGS="-I../../zlib-1.3.1"
-          export LDFLAGS="-I../../zlib-1.3.1"
+          export CPPFLAGS="-I../../zlib-${{ env.ZLIB_VERSION }}"
+          export LDFLAGS="-I../../zlib-${{ env.ZLIB_VERSION }}"
           export PREFIX_UNIX="$(cygpath $PREFIX)"
           echo "prefix=$PREFIX_UNIX"
           ./configure --enable-static=yes --enable-shared=no --prefix=$PREFIX_UNIX
@@ -414,7 +418,7 @@ jobs:
           set VERSION=${{ steps.xapian-version.outputs.version }}
           cd xapian\xapian-core-%VERSION%
           set PATH=C:\msys64\usr\bin;%PATH%
-          set LIB=..\..\zlib-1.3.1;%LIB%
+          set LIB=..\..\zlib-${{ env.ZLIB_VERSION }};%LIB%
           set PREFIX=${{ github.workspace }}\xapian-install
           set MSYS2_PATH_TYPE=inherit
           bash -c "./run_me.sh"
@@ -568,7 +572,7 @@ jobs:
       run: |
         # Using a fixed Qt6 version for stability
         # Update this version when a new Qt6 is released
-        VERSION="6.10.0"
+        VERSION="${{ env.QT6_VERSION }}"
         echo "Qt6 version: $VERSION"
         echo "version=$VERSION" >> $GITHUB_OUTPUT
       shell: bash
@@ -922,14 +926,14 @@ jobs:
     - name: Download zlib (Windows)
       if: matrix.platform == 'windows'
       run: |
-        curl -L -o zlib.tgz https://zlib.net/zlib-1.3.1.tar.gz
+        curl -L -o zlib.tgz https://zlib.net/zlib-${{ env.ZLIB_VERSION }}.tar.gz
         tar zxvf zlib.tgz
 
     - name: Build zlib (Windows)
       if: matrix.platform == 'windows'
       shell: cmd
       run: |
-        cd zlib-1.3.1
+        cd zlib-${{ env.ZLIB_VERSION }}
         @rem nmake -f win32\Makefile.msc LOC="-MT" all
         nmake -f win32\Makefile.msc LOC="-MT" zlib.lib
 
@@ -985,7 +989,7 @@ jobs:
     - name: Download LLVM artifacts
       uses: actions/download-artifact@v7
       with:
-        name: llvm-static-21.1.5-${{ matrix.os }}
+        name: llvm-static-${{ env.LLVM_VERSION }}-${{ matrix.os }}
         path: llvm-artifact
 
     - name: Extract LLVM version from artifact
@@ -1008,20 +1012,6 @@ jobs:
         ls llvm-install
       shell: bash
 
-    - name: Remove dynamic library (MacOS)
-      if: matrix.platform == 'macosx'
-      run: |
-        rm llvm-install/lib/libclang.dylib
-        rm llvm-install/lib/libclang-cpp.dylib
-      shell: bash
-
-    - name: Remove dynamic library (Linux)
-      if: matrix.platform == 'linux'
-      run: |
-        rm llvm-install/lib/libclang.so
-        rm llvm-install/lib/libclang-cpp.so
-      shell: bash
-
     - name: Extract LLVM artifacts (Windows)
       if: matrix.platform == 'windows'
       run: |
@@ -1036,7 +1026,7 @@ jobs:
     - name: Download Qt6 artifacts
       uses: actions/download-artifact@v7
       with:
-        name: qt6-static-6.10.0-${{ matrix.os }}
+        name: qt6-static-${{ env.QT6_VERSION }}-${{ matrix.os }}
         path: qt6-artifact
 
     - name: Extract Qt6 version from artifact
@@ -1073,7 +1063,7 @@ jobs:
     - name: Download Xapian artifacts
       uses: actions/download-artifact@v7
       with:
-        name: xapian-static-1.4.29-${{ matrix.os }}
+        name: xapian-static-${{ env.XAPIAN_VERSION }}-${{ matrix.os }}
         path: xapian-artifact
 
     - name: Extract Xapian version from artifact
@@ -1183,8 +1173,8 @@ jobs:
               -DQt6Core_DIR=${{ github.workspace }}\qt6-install\lib\cmake\Qt6Core ^
               -DQt6Gui_DIR=${{ github.workspace }}\qt6-install\lib\cmake\Qt6Gui ^
               -DQt6Widgets_DIR=${{ github.workspace }}\qt6-install\lib\cmake\Qt6Widgets ^
-              -DZLIB_LIBRARY=${{ github.workspace }}\zlib-1.3.1\zlib.lib ^
-              -DZLIB_INCLUDE_DIR=${{ github.workspace }}\zlib-1.3.1\include
+              -DZLIB_LIBRARY=${{ github.workspace }}\zlib-${{ env.ZLIB_VERSION }}\zlib.lib ^
+              -DZLIB_INCLUDE_DIR=${{ github.workspace }}\zlib-${{ env.ZLIB_VERSION }}\include
       shell: cmd
 
 #------------------------------------- build targets
@@ -1321,9 +1311,16 @@ jobs:
         mkdir -p installer
 
         # create source package
-        tar -C doxygen --exclude bin -c -v -f installer/doxygen-$VERSION.src.tar.gz \
+        tar -C doxygen --exclude bin -c -v -f doxygen-$VERSION.src.tar.gz \
           doc doc_internal deps vhdlparser libxml libversion examples addon src testing templates cmake \
-          CMakeLists.txt BUILD.txt INSTALL LANGUAGE.HOWTO LICENSE README.md
+          CMakeLists.txt BUILD.txt INSTALL LANGUAGE.HOWTO LICENSE README.md VERSION
+        mkdir install/doxygen-$VERSION
+        cd install/doxygen-$VERSION
+        tar zxvf ../../doxygen-$VERSION.src.tar.gz
+        cd ..
+        tar zcvf doxygen-$VERSION.src.tar.gz doxygen-$VERSION
+        rm -rf doxygen-$VERSION
+        cd ..
 
         # create PDF version of the manual
         cp doxygen/build/latex/doxygen_manual.pdf installer/doxygen_manual-$VERSION.pdf
@@ -1365,8 +1362,8 @@ jobs:
       if: matrix.platform == 'windows'
       uses: actions/upload-artifact@v6
       with:
-        name: doxygen-${{ steps.doxygen-version.outputs.version }}.x64.bin.zip
-        path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}.x64.bin.zip
+        name: doxygen-${{ steps.doxygen-version.outputs.version }}.windows.x64.bin.zip
+        path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}.windows.x64.bin.zip
 
     - name: Upload Doxygen build (Windows/doxygen_manual.chm)
       if: matrix.platform == 'windows'
