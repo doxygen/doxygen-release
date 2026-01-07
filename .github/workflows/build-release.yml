@@ -705,29 +705,33 @@ jobs:
 # DOXYGEN JOB
 #===============================================================
   build-doxygen:
-    name: Doxygen (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    name: Doxygen (${{ matrix.run_os }})
+    runs-on: ${{ matrix.run_os }}
     needs: [build-llvm, build-xapian, build-qt6]
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-22.04
+          - os: ubuntu-24.04
+            run_os: ubuntu-22.04
             cpu: intel
             platform: linux
             extension: ""
             archive_format: tar.gz
           - os: windows-latest
+            run_os: windows-latest
             cpu: intel
             platform: windows
             extension: .exe
             archive_format: zip
           - os: macos-15
+            run_os: macos-15
             cpu: arm
             platform: macos
             extension: ""
             archive_format: tar.gz
           - os: macos-15-intel
+            run_os: macos-15-intel
             cpu: intel
             platform: macos
             extension: ""
