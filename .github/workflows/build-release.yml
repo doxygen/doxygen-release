@@ -8,7 +8,7 @@ permissions:
 
 env:
   BUILD_TYPE: Release
-  LLVM_VERSION: 21.1.5
+  LLVM_VERSION: 15.0.7  # 21.1.5
   XAPIAN_VERSION: 1.4.29
   QT6_VERSION: 6.10.0
   ZLIB_VERSION: 1.3.1
@@ -25,7 +25,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
+          - os: ubuntu-22.04
             cpu: intel
             platform: linux
             extension: ""
@@ -246,7 +246,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
+          - os: ubuntu-22.04
             cpu: intel
             platform: linux
             extension: ""
@@ -481,7 +481,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
+          - os: ubuntu-22.04
             cpu: intel
             platform: linux
             extension: ""
@@ -705,33 +705,29 @@ jobs:
 # DOXYGEN JOB
 #===============================================================
   build-doxygen:
-    name: Doxygen (${{ matrix.run_os }})
-    runs-on: ${{ matrix.run_os }}
+    name: Doxygen (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     needs: [build-llvm, build-xapian, build-qt6]
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
-            run_os: ubuntu-22.04
+          - os: ubuntu-22.04
             cpu: intel
             platform: linux
             extension: ""
             archive_format: tar.gz
           - os: windows-latest
-            run_os: windows-latest
             cpu: intel
             platform: windows
             extension: .exe
             archive_format: zip
           - os: macos-15
-            run_os: macos-15
             cpu: arm
             platform: macos
             extension: ""
             archive_format: tar.gz
           - os: macos-15-intel
-            run_os: macos-15-intel
             cpu: intel
             platform: macos
             extension: ""
