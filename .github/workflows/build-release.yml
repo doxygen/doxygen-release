@@ -1269,7 +1269,7 @@ jobs:
           'R:\doxygen-install\bin\doxygen.exe'
           'R:\doxygen-install\bin\libclang.dll'
         )
-        Compress-Archive -Path $doxygen_zip_files -DestinationPath 'R:\installer\doxygen-${{ steps.doxygen-version.outputs.version }}.x64.bin.zip' -Force
+        Compress-Archive -Path $doxygen_zip_files -DestinationPath 'R:\installer\doxygen-${{ steps.doxygen-version.outputs.version }}.windows.x64.bin.zip' -Force
       shell: powershell
 
     - name: Create installer (macOS)
