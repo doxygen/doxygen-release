@@ -1279,6 +1279,7 @@ jobs:
         Compress-Archive -Path $doxygen_zip_files -DestinationPath 'R:\installer\doxygen-${{ steps.doxygen-version.outputs.version }}.windows.x64.bin.zip' -Force
       shell: powershell
 
+
     - name: Create installer (macOS)
       if: matrix.platform == 'macos'
       run: |
@@ -1298,6 +1299,53 @@ jobs:
         cp doxygen/build/bin/doxywizard     image/Doxygen.app/Contents/MacOS/Doxywizard
         /usr/sbin/diskutil rename image Doxygen
         hdiutil detach image
+
+      shell: bash
+
+    - name: Codesign executable (macOS)
+      if: matrix.platform == 'macos'
+      env:
+        MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+        MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+        MACOS_SIGNID: ${{ secrets.MACOS_SIGNID }}
+      run: |
+        # decode certificate
+        echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+
+        # create keychain
+        security create-keychain -p DoxygenPW build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p DoxygenPW build.keychain
+        security set-keychain-settings -t 3600 -u build.keychain
+
+        # import certificate
+        security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T productsign
+
+        # key signing
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k DoxygenPW build.keychain
+
+        # debug
+        security find-identity -v build.keychain
+
+        # sign code
+        codesign --force -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen -v
+        codesign --force -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer -v
+        codesign --force -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi -v
+        codesign --force -s $MACOS_SIGNID image/Doxygen.app/Contents/MacOS/Doxywizard -v
+        codesign --force -s $MACOS_SIGNID image/Doxygen.app -v
+
+        # verify signing
+        codesign -v image/Doxygen.app/Contents/Resources/doxygen --verbose
+        codesign -v image/Doxygen.app/Contents/Resources/doxyindexer --verbose
+        codesign -v image/Doxygen.app/Contents/Resources/doxysearch.cgi --verbose
+        codesign -v image/Doxygen.app/Contents/MacOS/Doxywizard --verbose
+        codesign -v image/Doxygen.app --verbose
+
+      shell: bash
+
+    - name: Codesign executable continued (macOS)
+      if: matrix.platform == 'macos'
+      run: |
         hdiutil convert -format UDCO -o installer/Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg macosx/template.sparseimage
         xattr -c installer/Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg
 
@@ -1307,8 +1355,8 @@ jobs:
         cp doxygen/build/bin/doxyindexer    doxygen-${{ steps.doxygen-version.outputs.version }}
         cp doxygen/build/bin/doxysearch.cgi doxygen-${{ steps.doxygen-version.outputs.version }}
         zip -r installer/doxygen-${{ steps.doxygen-version.outputs.version }}-mac-${{ matrix.cpu }}.zip doxygen-${{ steps.doxygen-version.outputs.version }}
-
       shell: bash
+
 
     - name: Create installer (Linux)
       if: matrix.platform == 'linux'
