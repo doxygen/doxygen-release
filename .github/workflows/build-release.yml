@@ -1311,6 +1311,7 @@ jobs:
       run: |
         # decode certificate
         echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+        which codesign
 
         # create keychain
         security create-keychain -p DoxygenPW build.keychain
@@ -1319,7 +1320,7 @@ jobs:
         security set-keychain-settings -t 3600 -u build.keychain
 
         # import certificate
-        security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T productsign
+        security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
 
         # key signing
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k DoxygenPW build.keychain
