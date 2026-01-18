@@ -123,7 +123,7 @@ jobs:
 #------------------------------------- configure LLVM
 
     - name: Configure CMake for LLVM (Linux/macOS)
-      if: matrix.platform != 'windows'
+      if: (matrix.platform != 'windows') && (steps.cache-llvm-source.outputs.cache-hit != 'true')
       run: |
         # Verify LLVM source directory exists
         if [ ! -d "llvm-project/llvm" ]; then
@@ -164,7 +164,7 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
 
     - name: Configure CMake for LLVM (Windows)
-      if: matrix.platform == 'windows'
+      if: (matrix.platform == 'windows') && (steps.cache-llvm-source.outputs.cache-hit != 'true')
       run: |
         mkdir llvm-project
         mkdir llvm-project\build
@@ -1344,7 +1344,7 @@ jobs:
 
       shell: bash
 
-    - name: Codesign executable continued (macOS)
+    - name: Create installer continued (macOS)
       if: matrix.platform == 'macos'
       run: |
         hdiutil convert -format UDCO -o installer/Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg macosx/template.sparseimage
@@ -1358,6 +1358,15 @@ jobs:
         zip -r installer/doxygen-${{ steps.doxygen-version.outputs.version }}-mac-${{ matrix.cpu }}.zip doxygen-${{ steps.doxygen-version.outputs.version }}
       shell: bash
 
+    - name: Notarization (macOS)
+      if: matrix.platform == 'macos'
+      env:
+        MACOS_SIGNID: ${{ secrets.MACOS_SIGNID }}
+        MACOS_NOTARIZATION_USER: ${{ secrets.MACOS_NOTARIZATION_USER }}
+        MACOS_NOTARIZATION_PWD: ${{ secrets.MACOS_NOTARIZATION_PWD }}
+      run: |
+        xcrun notarytool submit installer/Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg --apple-id $MACOS_NOTARIZATION_USER --team-id $MACOS_SIGNID --password $MACOS_NOTARIZATION_PWD --output-format json --wait
+      shell: bash
 
     - name: Create installer (Linux)
       if: matrix.platform == 'linux'
