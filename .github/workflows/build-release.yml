@@ -123,7 +123,7 @@ jobs:
 #------------------------------------- configure LLVM
 
     - name: Configure CMake for LLVM (Linux/macOS)
-      if: (matrix.platform != 'windows') && (steps.cache-llvm-source.outputs.cache-hit != 'true')
+      if: matrix.platform != 'windows'
       run: |
         # Verify LLVM source directory exists
         if [ ! -d "llvm-project/llvm" ]; then
@@ -164,7 +164,7 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
 
     - name: Configure CMake for LLVM (Windows)
-      if: (matrix.platform == 'windows') && (steps.cache-llvm-source.outputs.cache-hit != 'true')
+      if: matrix.platform == 'windows'
       run: |
         mkdir llvm-project
         mkdir llvm-project\build
