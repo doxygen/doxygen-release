@@ -1304,8 +1304,6 @@ jobs:
         cp doxygen/build/bin/doxyindexer    image/Doxygen.app/Contents/Resources
         cp doxygen/build/bin/doxysearch.cgi image/Doxygen.app/Contents/Resources
         cp doxygen/build/bin/doxywizard     image/Doxygen.app/Contents/MacOS/Doxywizard
-        /usr/sbin/diskutil rename image Doxygen
-        hdiutil detach image
 
       shell: bash
 
@@ -1354,6 +1352,9 @@ jobs:
     - name: Create installer continued (macOS)
       if: matrix.platform == 'macos'
       run: |
+        /usr/sbin/diskutil rename image Doxygen
+        hdiutil detach image
+
         hdiutil convert -format UDCO -o installer/Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg macosx/template.sparseimage
         xattr -c installer/Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg
 
