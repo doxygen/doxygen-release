@@ -1315,32 +1315,43 @@ jobs:
         MACOS_SIGNID: ${{ secrets.MACOS_SIGNID }}
       run: |
         # decode certificate
+        echo "--- decoding certificate"
         echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
         which codesign
 
         # create keychain
+        echo "--- creating keychain"
         security create-keychain -p DoxygenPW build.keychain
         security default-keychain -s build.keychain
         security unlock-keychain -p DoxygenPW build.keychain
         security set-keychain-settings -t 3600 -u build.keychain
 
         # import certificate
+        echo "--- importing certificate"
         security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
 
         # key signing
+        echo "--- singing key"
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k DoxygenPW build.keychain
 
         # debug
+        echo "--- finding indentity"
         security find-identity -v build.keychain
 
         # sign code
-        codesign --force -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen -v
-        codesign --force -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer -v
-        codesign --force -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi -v
-        codesign --force -s $MACOS_SIGNID image/Doxygen.app/Contents/MacOS/Doxywizard -v
-        codesign --force -s $MACOS_SIGNID image/Doxygen.app -v
+        echo "--- signing executables"
+        codesign --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen -v
+        codesign --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer -v
+        codesign --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi -v
+        codesign --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app/Contents/MacOS/Doxywizard -v
+        codesign --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app -v
+
+        codesign --force -s $MACOS_SIGNID doxygen/build/bin/doxygen -v
+        codesign --force -s $MACOS_SIGNID doxygen/build/bin/doxyindexer -v
+        codesign --force -s $MACOS_SIGNID doxygen/build/bin/doxysearch.cgi -v
 
         # verify signing
+        echo "--- verifying signing"
         codesign -v image/Doxygen.app/Contents/Resources/doxygen --verbose
         codesign -v image/Doxygen.app/Contents/Resources/doxyindexer --verbose
         codesign -v image/Doxygen.app/Contents/Resources/doxysearch.cgi --verbose
@@ -1363,6 +1374,7 @@ jobs:
         cp doxygen/build/bin/doxygen        doxygen-${{ steps.doxygen-version.outputs.version }}
         cp doxygen/build/bin/doxyindexer    doxygen-${{ steps.doxygen-version.outputs.version }}
         cp doxygen/build/bin/doxysearch.cgi doxygen-${{ steps.doxygen-version.outputs.version }}
+        xattr -c -r doxygen-${{ steps.doxygen-version.outputs.version }}
         zip -r installer/doxygen-${{ steps.doxygen-version.outputs.version }}-mac-${{ matrix.cpu }}.zip doxygen-${{ steps.doxygen-version.outputs.version }}
       shell: bash
 
