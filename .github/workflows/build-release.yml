@@ -1317,7 +1317,6 @@ jobs:
         # decode certificate
         echo "--- decoding certificate"
         echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
-        which codesign
 
         # create keychain
         echo "--- creating keychain"
@@ -1331,7 +1330,7 @@ jobs:
         security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
 
         # key signing
-        echo "--- singing key"
+        echo "--- signing key"
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k DoxygenPW build.keychain
 
         # debug
@@ -1339,13 +1338,14 @@ jobs:
         security find-identity -v build.keychain
 
         # sign code
-        echo "--- signing executables"
+        echo "--- signing executables in the DMG"
         codesign --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen -v
         codesign --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer -v
         codesign --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi -v
         codesign --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app/Contents/MacOS/Doxywizard -v
         codesign --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app -v
 
+        echo "--- signing executables in the zip"
         codesign --force -s $MACOS_SIGNID doxygen/build/bin/doxygen -v
         codesign --force -s $MACOS_SIGNID doxygen/build/bin/doxyindexer -v
         codesign --force -s $MACOS_SIGNID doxygen/build/bin/doxysearch.cgi -v
@@ -1378,7 +1378,7 @@ jobs:
         zip -r installer/doxygen-${{ steps.doxygen-version.outputs.version }}-mac-${{ matrix.cpu }}.zip doxygen-${{ steps.doxygen-version.outputs.version }}
       shell: bash
 
-    - name: Notarization (macOS)
+    - name: Notarization and Stapling (macOS)
       if: matrix.platform == 'macos'
       env:
         MACOS_SIGNID: ${{ secrets.MACOS_SIGNID }}
@@ -1386,6 +1386,7 @@ jobs:
         MACOS_NOTARIZATION_PWD: ${{ secrets.MACOS_NOTARIZATION_PWD }}
       run: |
         xcrun notarytool submit installer/Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg --apple-id $MACOS_NOTARIZATION_USER --team-id $MACOS_SIGNID --password $MACOS_NOTARIZATION_PWD --output-format json --wait
+        xcrun stapler staple installer/Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg
       shell: bash
 
     - name: Create installer (Linux)
