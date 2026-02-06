@@ -1304,6 +1304,7 @@ jobs:
         cp doxygen/build/bin/doxyindexer    image/Doxygen.app/Contents/Resources
         cp doxygen/build/bin/doxysearch.cgi image/Doxygen.app/Contents/Resources
         cp doxygen/build/bin/doxywizard     image/Doxygen.app/Contents/MacOS/Doxywizard
+        xattr -c -r image/Doxygen.app
 
       shell: bash
 
