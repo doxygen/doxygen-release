@@ -1262,9 +1262,6 @@ jobs:
         editbin R:\doxygen-install\bin\doxygen.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
         editbin R:\doxygen-install\bin\doxyindexer.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
         editbin R:\doxygen-install\bin\doxysearch.cgi.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
-        mt.exe -manifest windows\doxygen.manifest -updateresource:R:\doxygen-install\bin\doxygen.exe;#1
-        mt.exe -manifest windows\doxygen.manifest -updateresource:R:\doxygen-install\bin\doxyindexer.exe;#1
-        mt.exe -manifest windows\doxygen.manifest -updateresource:R:\doxygen-install\bin\doxysearch.cgi.exe;#1
         Write-Host "Using version: '${{ steps.doxygen-version.outputs.version }}'"
         (Get-Content .\windows\doxygen.iss -Raw) -replace '\$VERSION','${{ steps.doxygen-version.outputs.version }}' | Set-Content -Encoding ASCII .\doxygen-versioned.iss
         # invoke the inno setup compiler
