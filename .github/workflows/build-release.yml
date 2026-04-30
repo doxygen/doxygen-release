@@ -591,15 +591,23 @@ jobs:
 
 #------------------------------------- download Qt6 sources
 
-    #- name: Cache Qt6 source
-    #  id: cache-qt6-source
-    #  uses: actions/cache@v4
-    #  with:
-    #    path: qt6-source
-    #    key: qt6-source-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}
+    - name: Cache Qt6 install
+      id: cache-qt6-install
+      uses: actions/cache@v4
+      with:
+        path: qt6-install
+        key: qt6-install-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}
+
+    - name: Cache Qt6 source
+      id: cache-qt6-source
+      if: steps.cache-qt6-install.outputs.cache-hit != 'true'
+      uses: actions/cache@v4
+      with:
+        path: qt6-source
+        key: qt6-source-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}
 
     - name: Download Qt6 source code
-      #if: steps.cache-qt6-source.outputs.cache-hit != 'true'
+      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && steps.cache-qt6-source.outputs.cache-hit != 'true'
       run: |
         echo "Downloading Qt6 ${{ steps.qt6-version.outputs.version }}"
         VERSION="${{ steps.qt6-version.outputs.version }}"
@@ -631,7 +639,7 @@ jobs:
 #------------------------------------- configure Qt6 for building
 
     - name: Configure CMake for Qt6 Base (Windows)
-      if: matrix.platform == 'windows'
+      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform == 'windows'
       run: |
         cd qt6-source\qtbase
         call configure.bat -static -static-runtime -release -prefix ${{ github.workspace }}\qt6-install -platform win32-msvc -qt-zlib -qt-pcre -qt-libpng -qt-libjpeg -qt-freetype -opengl desktop -sql-sqlite -sql-odbc -no-openssl -opensource -confirm-license -make libs -nomake tools -nomake tests
@@ -640,7 +648,7 @@ jobs:
       shell: cmd
 
     - name: Configure CMake for Qt6 Base (Linux)
-      if: matrix.platform == 'linux'
+      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform == 'linux'
       run: |
         cd qt6-source/qtbase
         ./configure -static -static-runtime -release -prefix ${{ github.workspace }}/qt6-install -platform linux-g++-64 -qt-zlib -qt-pcre -qt-libpng -qt-libjpeg -qt-freetype -opengl desktop -sql-sqlite -no-openssl -opensource -confirm-license -make libs -nomake tools -nomake tests
@@ -649,7 +657,7 @@ jobs:
       shell: bash
 
     - name: Configure CMake for Qt6 Base (macOS)
-      if: matrix.platform == 'macos'
+      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform == 'macos'
       run: |
         cd qt6-source/qtbase
         ./configure -static -static-runtime -release -prefix ${{ github.workspace }}/qt6-install -platform macx-clang -qt-zlib -qt-pcre -qt-libpng -qt-libjpeg -qt-freetype -opengl desktop -sql-sqlite -no-openssl -opensource -confirm-license -make libs -nomake tools -nomake tests
@@ -658,7 +666,7 @@ jobs:
       shell: bash
 
     - name: Configure CMake for Qt6 SVG (Windows)
-      if: matrix.platform == 'windows'
+      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform == 'windows'
       run: |
         cd qt6-source\qtsvg
         call ${{ github.workspace }}\qt6-install\bin\qt-configure-module.bat .
@@ -667,7 +675,7 @@ jobs:
       shell: cmd
 
     - name: Configure CMake for Qt6 SVG (Linux/macOS)
-      if: matrix.platform != 'windows'
+      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform != 'windows'
       run: |
         cd qt6-source/qtsvg
         ${{ github.workspace }}/qt6-install/bin/qt-configure-module .
