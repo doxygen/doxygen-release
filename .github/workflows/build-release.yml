@@ -104,15 +104,23 @@ jobs:
 
 #------------------------------------- get LLVM sources to build
 
+    - name: Cache LLVM install
+      id: cache-llvm-install
+      uses: actions/cache@v4
+      with:
+        path: llvm-install
+        key: llvm-install-${{ steps.llvm-version.outputs.tag }}-${{ matrix.os }}
+
     - name: Cache LLVM source
       id: cache-llvm-source
+      if: steps.cache-llvm-install.outputs.cache-hit != 'true'
       uses: actions/cache@v4
       with:
         path: llvm-project
         key: llvm-source-${{ steps.llvm-version.outputs.tag }}-${{ matrix.os }}
 
     - name: Download LLVM source code
-      if: steps.cache-llvm-source.outputs.cache-hit != 'true'
+      if: steps.cache-llvm-install.outputs.cache-hit != 'true' && steps.cache-llvm-source.outputs.cache-hit != 'true'
       run: |
         echo "Downloading LLVM ${{ steps.llvm-version.outputs.tag }}"
         git clone --depth 1 --branch ${{ steps.llvm-version.outputs.tag }} https://github.com/llvm/llvm-project.git
@@ -126,7 +134,7 @@ jobs:
 #------------------------------------- configure LLVM
 
     - name: Configure CMake for LLVM (Linux/macOS)
-      if: matrix.platform != 'windows'
+      if: steps.cache-llvm-install.outputs.cache-hit != 'true' && matrix.platform != 'windows'
       run: |
         # Verify LLVM source directory exists
         if [ ! -d "llvm-project/llvm" ]; then
@@ -167,7 +175,7 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
 
     - name: Configure CMake for LLVM (Windows)
-      if: matrix.platform == 'windows'
+      if: steps.cache-llvm-install.outputs.cache-hit != 'true' && matrix.platform == 'windows'
       run: |
         mkdir llvm-project
         mkdir llvm-project\build
