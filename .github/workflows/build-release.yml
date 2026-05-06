@@ -977,24 +977,33 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        set -euo pipefail
-        echo "GITHUB_TOKEN present: ${GITHUB_TOKEN:+yes}"
-        resp=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/doxygen/doxygen/tags" ) || true
-        tag=$(echo "$resp" | jq -r '.[0].name // empty')
-        LATEST_TAG="$tag"
+        # use latest tagged version
+        if [ "${{ github.event.inputs.git_source_version }}" == "tagged" ]; then
+          set -euo pipefail
+          echo "GITHUB_TOKEN present: ${GITHUB_TOKEN:+yes}"
+          resp=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/doxygen/doxygen/tags" ) || true
+          tag=$(echo "$resp" | jq -r '.[0].name // empty')
+          LATEST_TAG="$tag"
 
-        if [ -z "${LATEST_TAG:-}" ]; then
-          echo "Error: Could not fetch Doxygen release tag; last response:"
-          echo "$resp" | jq -C '.' || echo "$resp"
-          exit 1
+          if [ -z "${LATEST_TAG:-}" ]; then
+            echo "Error: Could not fetch Doxygen release tag; last response:"
+            echo "$resp" | jq -C '.' || echo "$resp"
+            exit 1
+          fi
+
+          echo "Latest Doxygen tag: $LATEST_TAG"
+          echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          # Remove leading 'Release_' prefix if present
+          VERSION=${LATEST_TAG#Release_}
+          VERSION=${VERSION//_/.}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+        else # value is "master"
+          # alternatively use latest master
+          git clone --depth 1 --branch master https://github.com/doxygen/doxygen.git
+          VERSION=`cat doxygen/VERSION`
+          echo "tag=master" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
         fi
-
-        echo "Latest Doxygen tag: $LATEST_TAG"
-        echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
-        # Remove leading 'Release_' prefix if present
-        VERSION=${LATEST_TAG#Release_}
-        VERSION=${VERSION//_/.}
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
       shell: bash
 
 #------------------------------------- download Doxygen sources
@@ -1008,8 +1017,7 @@ jobs:
           # download source for latest tagged release
           git clone --depth 1 --branch ${{ steps.doxygen-version.outputs.tag }} https://github.com/doxygen/doxygen.git
         else # value is "master"
-          # alternatively use latest master
-          git clone --depth 1 --branch master https://github.com/doxygen/doxygen.git
+          # alternatively use latest master, sources are already downloaded in the previous step
         fi
 
         if [ ! -d "doxygen" ]; then
