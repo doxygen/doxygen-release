@@ -1159,7 +1159,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/doxygen-install" \
           -DXAPIAN_LIBRARIES="${{ github.workspace }}/xapian-install/lib/libxapian.a" \
           -DXAPIAN_INCLUDE_DIR="${{ github.workspace }}/xapian-install/include" \
-          -DXAPIAN_DIR="${{ github.workspace }}/xapian-install/lib/cmake/xapian" $UUID_FLAG \
+          $UUID_FLAG \
           -DLLVM_DIR="${{ github.workspace }}/llvm-install/lib/cmake/llvm" \
           -DClang_DIR="${{ github.workspace }}/llvm-install/lib/cmake/clang" \
           -DQt6_DIR="${{ github.workspace }}/qt6-install/lib/cmake/Qt6" \
@@ -1189,7 +1189,7 @@ jobs:
           -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/doxygen-install" \
           -DXAPIAN_LIBRARIES="${{ github.workspace }}/xapian-install/lib/libxapian.a" \
           -DXAPIAN_INCLUDE_DIR="${{ github.workspace }}/xapian-install/include" \
-          -DXAPIAN_DIR="${{ github.workspace }}/xapian-install/lib/cmake/xapian" $UUID_FLAG \
+          $UUID_FLAG \
           -DLLVM_DIR="${{ github.workspace }}/llvm-install/lib/cmake/llvm" \
           -DClang_DIR="${{ github.workspace }}/llvm-install/lib/cmake/clang" \
           -DQt6_DIR="${{ github.workspace }}/qt6-install/lib/cmake/Qt6" \
@@ -1215,7 +1215,6 @@ jobs:
               -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\doxygen-install ^
               -DXAPIAN_LIBRARIES=${{ github.workspace }}\xapian-install\lib\xapian.lib ^
               -DXAPIAN_INCLUDE_DIR=${{ github.workspace }}\xapian-install\include ^
-              -DXAPIAN_DIR=${{ github.workspace }}\xapian-install\lib\cmake\xapian ^
               -DLLVM_DIR=${{ github.workspace }}\llvm-install\lib\cmake\llvm ^
               -DClang_DIR=${{ github.workspace }}\llvm-install\lib\cmake\clang ^
               -DCLANG_LIBS=${{ github.workspace }}\llvm-install\lib\libclang.lib ^
