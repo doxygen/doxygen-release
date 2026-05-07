@@ -1017,7 +1017,7 @@ jobs:
           # download source for latest tagged release
           git clone --depth 1 --branch ${{ steps.doxygen-version.outputs.tag }} https://github.com/doxygen/doxygen.git
         else # value is "master"
-          # alternatively use latest master, sources are already downloaded in the previous step
+          echo "using latest master (${{ steps.doxygen-version.outputs.version }}), sources are already downloaded in the previous step"
         fi
 
         if [ ! -d "doxygen" ]; then
