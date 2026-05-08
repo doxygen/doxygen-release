@@ -650,7 +650,7 @@ jobs:
         mv qttools-everywhere-src-$VERSION qttools
         rm qttools.tar.xz
 
-        if [ ! -d "qtbase" ] || [ ! -d "qtsvg" ] || [ ! -d "qttranslations" ] || [ -d "qttools" ]; then
+        if [ ! -d "qtbase" ] || [ ! -d "qtsvg" ] || [ ! -d "qttranslations" ] || [ ! -d "qttools" ]; then
           echo "Error: Qt6 source download failed or directory structure is incorrect"
           exit 1
         fi
