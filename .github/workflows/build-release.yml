@@ -638,7 +638,13 @@ jobs:
         mv qtsvg-everywhere-src-$VERSION qtsvg
         rm qtsvg.tar.xz
 
-        if [ ! -d "qtbase" ] || [ ! -d "qtsvg" ]; then
+        echo "Downloading qttranslations..."
+        curl -L -o qtsvg.tar.xz "https://download.qt.io/official_releases/qt/$MAJOR_MINOR/$VERSION/submodules/qttranslations-everywhere-src-$VERSION.tar.xz"
+        tar -xf qttranslations.tar.xz
+        mv qttranslations-everywhere-src-$VERSION qttranslations
+        rm qttranslations.tar.xz
+
+        if [ ! -d "qtbase" ] || [ ! -d "qtsvg" ] || [ ! -d "qttranslations" ]; then
           echo "Error: Qt6 source download failed or directory structure is incorrect"
           exit 1
         fi
@@ -687,6 +693,24 @@ jobs:
       if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform != 'windows'
       run: |
         cd qt6-source/qtsvg
+        ${{ github.workspace }}/qt6-install/bin/qt-configure-module .
+        cmake --build . --parallel
+        cmake --install .
+      shell: bash
+
+    - name: Configure CMake for Qt6 translations (Windows)
+      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform == 'windows'
+      run: |
+        cd qt6-source\qttranslations
+        call ${{ github.workspace }}\qt6-install\bin\qt-configure-module.bat .
+        cmake --build . --parallel
+        cmake --install .
+      shell: cmd
+
+    - name: Configure CMake for Qt6 translations (Linux/macOS)
+      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform != 'windows'
+      run: |
+        cd qt6-source/qttranslations
         ${{ github.workspace }}/qt6-install/bin/qt-configure-module .
         cmake --build . --parallel
         cmake --install .
