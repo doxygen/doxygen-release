@@ -644,7 +644,13 @@ jobs:
         mv qttranslations-everywhere-src-$VERSION qttranslations
         rm qttranslations.tar.xz
 
-        if [ ! -d "qtbase" ] || [ ! -d "qtsvg" ] || [ ! -d "qttranslations" ]; then
+        echo "Downloading qttools..."
+        curl -L -o qttools.tar.xz "https://download.qt.io/official_releases/qt/$MAJOR_MINOR/$VERSION/submodules/qttools-everywhere-src-$VERSION.tar.xz"
+        tar -xf qttools.tar.xz
+        mv qttools-everywhere-src-$VERSION qttools
+        rm qttools.tar.xz
+
+        if [ ! -d "qtbase" ] || [ ! -d "qtsvg" ] || [ ! -d "qttranslations" ] || [ -d "qttools" ]; then
           echo "Error: Qt6 source download failed or directory structure is incorrect"
           exit 1
         fi
@@ -711,6 +717,24 @@ jobs:
       if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform != 'windows'
       run: |
         cd qt6-source/qttranslations
+        ${{ github.workspace }}/qt6-install/bin/qt-configure-module .
+        cmake --build . --parallel
+        cmake --install .
+      shell: bash
+
+    - name: Configure CMake for Qt6 tools (Windows)
+      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform == 'windows'
+      run: |
+        cd qt6-source\qttools
+        call ${{ github.workspace }}\qt6-install\bin\qt-configure-module.bat .
+        cmake --build . --parallel
+        cmake --install .
+      shell: cmd
+
+    - name: Configure CMake for Qt6 tools (Linux/macOS)
+      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform != 'windows'
+      run: |
+        cd qt6-source/qttools
         ${{ github.workspace }}/qt6-install/bin/qt-configure-module .
         cmake --build . --parallel
         cmake --install .
