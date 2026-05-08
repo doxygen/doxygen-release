@@ -639,7 +639,7 @@ jobs:
         rm qtsvg.tar.xz
 
         echo "Downloading qttranslations..."
-        curl -L -o qtsvg.tar.xz "https://download.qt.io/official_releases/qt/$MAJOR_MINOR/$VERSION/submodules/qttranslations-everywhere-src-$VERSION.tar.xz"
+        curl -L -o qttranslations.tar.xz "https://download.qt.io/official_releases/qt/$MAJOR_MINOR/$VERSION/submodules/qttranslations-everywhere-src-$VERSION.tar.xz"
         tar -xf qttranslations.tar.xz
         mv qttranslations-everywhere-src-$VERSION qttranslations
         rm qttranslations.tar.xz
