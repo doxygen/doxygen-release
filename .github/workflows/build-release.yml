@@ -686,6 +686,24 @@ jobs:
         cmake --install .
       shell: bash
 
+    - name: Configure CMake for Qt6 tools (Windows)
+      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform == 'windows'
+      run: |
+        cd qt6-source\qttools
+        call ${{ github.workspace }}\qt6-install\bin\qt-configure-module.bat .
+        cmake --build . --parallel
+        cmake --install .
+      shell: cmd
+
+    - name: Configure CMake for Qt6 tools (Linux/macOS)
+      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform != 'windows'
+      run: |
+        cd qt6-source/qttools
+        ${{ github.workspace }}/qt6-install/bin/qt-configure-module .
+        cmake --build . --parallel
+        cmake --install .
+      shell: bash
+
     - name: Configure CMake for Qt6 SVG (Windows)
       if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform == 'windows'
       run: |
@@ -722,23 +740,6 @@ jobs:
         cmake --install .
       shell: bash
 
-    - name: Configure CMake for Qt6 tools (Windows)
-      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform == 'windows'
-      run: |
-        cd qt6-source\qttools
-        call ${{ github.workspace }}\qt6-install\bin\qt-configure-module.bat .
-        cmake --build . --parallel
-        cmake --install .
-      shell: cmd
-
-    - name: Configure CMake for Qt6 tools (Linux/macOS)
-      if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform != 'windows'
-      run: |
-        cd qt6-source/qttools
-        ${{ github.workspace }}/qt6-install/bin/qt-configure-module .
-        cmake --build . --parallel
-        cmake --install .
-      shell: bash
 
 #------------------------------------- verify Qt6 build results
 
