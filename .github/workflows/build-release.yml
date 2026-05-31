@@ -1245,6 +1245,8 @@ jobs:
           -DQt6Core_DIR="${{ github.workspace }}/qt6-install/lib/cmake/Qt6Core" \
           -DQt6Gui_DIR="${{ github.workspace }}/qt6-install/lib/cmake/Qt6Gui" \
           -DQt6Widgets_DIR="${{ github.workspace }}/qt6-install/lib/cmake/Qt6Widgets" \
+          -DCMAKE_EXE_LINKER_FLAGS="-Wl,-no_adhoc_codesign" \
+          -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-no_adhoc_codesign" \
           -Dbuild_search=YES \
           -Dbuild_wizard=YES \
           -Duse_libclang=YES \
