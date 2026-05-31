@@ -1379,12 +1379,13 @@ jobs:
         mkdir image
         bunzip2 -k macosx/template.sparseimage.bz2
         hdiutil attach macosx/template.sparseimage -noautoopen -quiet -mountpoint image
-        cp -a macosx/Doxygen.app image
+        #cp -a macosx/Doxygen.app image
         mkdir -p image/Doxygen.app/Contents/MacOS
+        mkdir -p image/Doxygen.app/Contents/Resources
         sed -i -e "s/\$VERSION/${{ steps.doxygen-version.outputs.version }}/g" image/Doxygen.app/Contents/Info.plist
-        cp doxygen/build/bin/doxygen        image/Doxygen.app/Contents/Resources
-        cp doxygen/build/bin/doxyindexer    image/Doxygen.app/Contents/Resources
-        cp doxygen/build/bin/doxysearch.cgi image/Doxygen.app/Contents/Resources
+        cp doxygen/build/bin/doxygen        image/Doxygen.app/Contents/Resources/
+        cp doxygen/build/bin/doxyindexer    image/Doxygen.app/Contents/Resources/
+        cp doxygen/build/bin/doxysearch.cgi image/Doxygen.app/Contents/Resources/
         cp doxygen/build/bin/doxywizard     image/Doxygen.app/Contents/MacOS/Doxywizard
         xattr -c -r image/Doxygen.app
 
@@ -1423,11 +1424,11 @@ jobs:
         # sign code
         echo "--- signing executables in the DMG"
         ls image/Doxygen.app/Contents/Resources
-        #codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen
-        #codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer
-        #codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi
-        #codesign --verbose --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app/Contents/MacOS/Doxywizard
-        codesign --verbose --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app || echo "ignore failure"
+        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen
+        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer
+        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi
+        codesign --verbose --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app/Contents/MacOS/Doxywizard
+        #codesign --verbose --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app || echo "ignore failure"
 
         echo "--- signing executables in the zip"
         codesign --verbose --force -s $MACOS_SIGNID doxygen/build/bin/doxygen
