@@ -1424,9 +1424,12 @@ jobs:
         # sign code
         echo "--- signing executables in the DMG"
         ls image/Doxygen.app/Contents/Resources
-        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen
-        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer
-        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi
+        #codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen
+        #codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer
+        #codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi
+        codesign --verbose --force -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen
+        codesign --verbose --force -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer
+        codesign --verbose --force -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi
         codesign --verbose --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app/Contents/MacOS/Doxywizard
         #codesign --verbose --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app || echo "ignore failure"
 
