@@ -1380,7 +1380,7 @@ jobs:
         bunzip2 -k macosx/template.sparseimage.bz2
         hdiutil attach macosx/template.sparseimage -noautoopen -quiet -mountpoint image
         cp -a macosx/Doxygen.app image
-        cp -a macosx/Readme.rtf image
+        #cp -a macosx/Readme.rtf image
         mkdir -p image/Doxygen.app/Contents/MacOS
         sed -i -e "s/\$VERSION/${{ steps.doxygen-version.outputs.version }}/g" image/Doxygen.app/Contents/Info.plist
         cp doxygen/build/bin/doxygen        image/Doxygen.app/Contents/Resources
