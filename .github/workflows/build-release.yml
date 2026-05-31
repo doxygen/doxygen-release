@@ -1435,12 +1435,11 @@ jobs:
 
         # verify signing
         echo "--- verifying signing"
-        ls image/Doxygen.app/Contents/Resources
-        codesign --verify --verbose image/Doxygen.app/Contents/Resources/doxygen
-        codesign --verify --verbose image/Doxygen.app/Contents/Resources/doxyindexer
-        codesign --verify --verbose image/Doxygen.app/Contents/Resources/doxysearch.cgi
-        codesign --verify --verbose image/Doxygen.app/Contents/MacOS/Doxywizard
-        codesign --verify --verbose image/Doxygen.app
+        codesign -v image/Doxygen.app/Contents/Resources/doxygen --verbose
+        codesign -v image/Doxygen.app/Contents/Resources/doxyindexer --verbose
+        codesign -v image/Doxygen.app/Contents/Resources/doxysearch.cgi --verbose
+        codesign -v image/Doxygen.app/Contents/MacOS/Doxywizard --verbose
+        codesign -v image/Doxygen.app --verbose
 
       shell: bash
 
