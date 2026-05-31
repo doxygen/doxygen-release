@@ -1431,25 +1431,25 @@ jobs:
         #codesign --remove-signature image/Doxygen.app/Contents/Resources/doxygen
         #codesign --remove-signature image/Doxygen.app/Contents/Resources/doxyindexer
         #codesign --remove-signature image/Doxygen.app/Contents/Resources/doxysearch.cgi
-        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen
-        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer
-        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi
-        codesign --verbose --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app/Contents/MacOS/Doxywizard
+        codesign -vvvv --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen
+        codesign -vvvv --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer
+        codesign -vvvv --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi
+        codesign -vvvv --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app/Contents/MacOS/Doxywizard
         #codesign --verbose --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app || echo "ignore failure"
 
         echo "--- signing executables in the zip"
-        codesign --verbose --force -s $MACOS_SIGNID doxygen/build/bin/doxygen
-        codesign --verbose --force -s $MACOS_SIGNID doxygen/build/bin/doxyindexer
-        codesign --verbose --force -s $MACOS_SIGNID doxygen/build/bin/doxysearch.cgi
+        codesign -vvvv --force -s $MACOS_SIGNID doxygen/build/bin/doxygen
+        codesign -vvvv --force -s $MACOS_SIGNID doxygen/build/bin/doxyindexer
+        codesign -vvvv --force -s $MACOS_SIGNID doxygen/build/bin/doxysearch.cgi
 
         # verify signing
         echo "--- verifying signing"
         ls image/Doxygen.app/Contents/Resources
-        codesign --verify --verbose image/Doxygen.app/Contents/Resources/doxygen
-        codesign --verify --verbose image/Doxygen.app/Contents/Resources/doxyindexer
-        codesign --verify --verbose image/Doxygen.app/Contents/Resources/doxysearch.cgi
-        codesign --verify --verbose image/Doxygen.app/Contents/MacOS/Doxywizard
-        codesign --verify --verbose image/Doxygen.app
+        codesign --verify -vvvv image/Doxygen.app/Contents/Resources/doxygen
+        codesign --verify -vvvv image/Doxygen.app/Contents/Resources/doxyindexer
+        codesign --verify -vvvv image/Doxygen.app/Contents/Resources/doxysearch.cgi
+        codesign --verify -vvvv image/Doxygen.app/Contents/MacOS/Doxywizard
+        codesign --verify -vvvv image/Doxygen.app
 
       shell: bash
 
