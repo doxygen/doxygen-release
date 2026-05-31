@@ -1423,16 +1423,16 @@ jobs:
         # sign code
         echo "--- signing executables in the DMG"
         ls image/Doxygen.app/Contents/Resources
-        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen
-        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer
-        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi
-        codesign --verbose --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app/Contents/MacOS/Doxywizard
-        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app
+        #codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen
+        #codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer
+        #codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi
+        #codesign --verbose --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app/Contents/MacOS/Doxywizard
+        codesign --verbose --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app || echo "ignore failure"
 
         echo "--- signing executables in the zip"
-        codesign --force -s $MACOS_SIGNID doxygen/build/bin/doxygen -v
-        codesign --force -s $MACOS_SIGNID doxygen/build/bin/doxyindexer -v
-        codesign --force -s $MACOS_SIGNID doxygen/build/bin/doxysearch.cgi -v
+        codesign --verbose --force -s $MACOS_SIGNID doxygen/build/bin/doxygen
+        codesign --verbose --force -s $MACOS_SIGNID doxygen/build/bin/doxyindexer
+        codesign --verbose --force -s $MACOS_SIGNID doxygen/build/bin/doxysearch.cgi
 
         # verify signing
         echo "--- verifying signing"
