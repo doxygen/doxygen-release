@@ -1431,7 +1431,7 @@ jobs:
         #codesign --remove-signature image/Doxygen.app/Contents/Resources/doxygen
         #codesign --remove-signature image/Doxygen.app/Contents/Resources/doxyindexer
         #codesign --remove-signature image/Doxygen.app/Contents/Resources/doxysearch.cgi
-        #codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen
+        codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen
         codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer
         codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi
         codesign --verbose --force --option=runtime --deep -s $MACOS_SIGNID image/Doxygen.app/Contents/MacOS/Doxywizard
@@ -1441,7 +1441,6 @@ jobs:
         codesign --verbose --force -s $MACOS_SIGNID doxygen/build/bin/doxygen
         codesign --verbose --force -s $MACOS_SIGNID doxygen/build/bin/doxyindexer
         codesign --verbose --force -s $MACOS_SIGNID doxygen/build/bin/doxysearch.cgi
-        cp -a -v doxygen/build/bin/doxygen image/Doxygen.app/Contents/Resources/doxygen
 
         # verify signing
         echo "--- verifying signing"
