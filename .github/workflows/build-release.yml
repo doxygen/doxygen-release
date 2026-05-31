@@ -1383,10 +1383,10 @@ jobs:
         mkdir -p image/Doxygen.app/Contents/MacOS
         mkdir -p image/Doxygen.app/Contents/Resources
         sed -i -e "s/\$VERSION/${{ steps.doxygen-version.outputs.version }}/g" image/Doxygen.app/Contents/Info.plist
-        cp doxygen/build/bin/doxygen        image/Doxygen.app/Contents/Resources/
-        cp doxygen/build/bin/doxyindexer    image/Doxygen.app/Contents/Resources/
-        cp doxygen/build/bin/doxysearch.cgi image/Doxygen.app/Contents/Resources/
-        cp doxygen/build/bin/doxywizard     image/Doxygen.app/Contents/MacOS/Doxywizard
+        cp -a -v doxygen/build/bin/doxygen        image/Doxygen.app/Contents/Resources/
+        cp -a -v doxygen/build/bin/doxyindexer    image/Doxygen.app/Contents/Resources/
+        cp -a -v doxygen/build/bin/doxysearch.cgi image/Doxygen.app/Contents/Resources/
+        cp -a -v doxygen/build/bin/doxywizard     image/Doxygen.app/Contents/MacOS/Doxywizard
         xattr -c -r image/Doxygen.app
 
       shell: bash
@@ -1424,11 +1424,11 @@ jobs:
         # sign code
         echo "--- signing executables in the DMG"
         ls image/Doxygen.app/Contents/Resources
+        file image/Doxygen.app/Contents/Resources/doxygen
+        otool -l image/Doxygen.app/Contents/Resources/doxygen | head -40
         codesign --remove-signature image/Doxygen.app/Contents/Resources/doxygen
         codesign --remove-signature image/Doxygen.app/Contents/Resources/doxyindexer
         codesign --remove-signature image/Doxygen.app/Contents/Resources/doxysearch.cgi
-        file image/Doxygen.app/Contents/Resources/doxygen
-        otool -l image/Doxygen.app/Contents/Resources/doxygen | head -40
         codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxygen
         codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxyindexer
         codesign --verbose --force --option=runtime -s $MACOS_SIGNID image/Doxygen.app/Contents/Resources/doxysearch.cgi
