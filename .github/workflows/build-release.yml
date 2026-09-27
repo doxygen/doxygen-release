@@ -20,6 +20,17 @@ env:
   XAPIAN_VERSION: 1.4.29
   QT6_VERSION: 6.10.0
   ZLIB_VERSION: 1.3.2
+  # SignPath (https://signpath.io) is used to code sign the Windows executables.
+  # These values identify the SignPath organization/project/artifact-configuration
+  # and can be overridden via repository variables, no workflow changes needed.
+  SIGNPATH_ORGANIZATION_ID: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+  SIGNPATH_PROJECT_SLUG: ${{ vars.SIGNPATH_PROJECT_SLUG || 'doxygen' }}
+  SIGNPATH_ARTIFACT_CONFIGURATION_SLUG: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG || 'windows-x64' }}
+  # 'test-signing' uses the self-signed test certificate provided by SignPath.
+  # Once SignPath has reviewed the setup and imported the production certificate,
+  # switch to production signing by setting the repository variable
+  # SIGNPATH_SIGNING_POLICY_SLUG to 'release-signing' (no workflow edit required).
+  SIGNPATH_SIGNING_POLICY_SLUG: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG || 'test-signing' }}
 
 jobs:
 
@@ -786,6 +797,11 @@ jobs:
     name: Doxygen (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     needs: [build-llvm, build-xapian, build-qt6]
+    # 'actions: read' is required by the SignPath GitHub Action to download the
+    # unsigned artifact that gets submitted for code signing (Windows only).
+    permissions:
+      contents: read
+      actions: read
     strategy:
       fail-fast: false
       matrix:
@@ -1336,7 +1352,7 @@ jobs:
 
 #------------------------------------- create installation artifacts
 
-    - name: Create installer (Windows)
+    - name: Prepare executables (Windows)
       if: matrix.platform == 'windows'
       run: |
         subst R: ${{ github.workspace }}
@@ -1345,6 +1361,53 @@ jobs:
         editbin R:\doxygen-install\bin\doxygen.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
         editbin R:\doxygen-install\bin\doxyindexer.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
         editbin R:\doxygen-install\bin\doxysearch.cgi.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
+      shell: powershell
+
+#------------------------------------- sign the Windows executables via SignPath
+#
+# The executables are code signed before they are packaged into the installer
+# and the zip archive, so both contain signed binaries. SignPath is configured
+# to use the self-signed test certificate by default (SIGNPATH_SIGNING_POLICY_SLUG
+# defaults to 'test-signing'); once SignPath has imported the production
+# certificate, switch to it by setting the repository variable
+# SIGNPATH_SIGNING_POLICY_SLUG to 'release-signing', no workflow change required.
+
+    - name: Upload unsigned executables (Windows)
+      if: matrix.platform == 'windows'
+      id: upload-unsigned-executables
+      uses: actions/upload-artifact@v6
+      with:
+        name: doxygen-${{ steps.doxygen-version.outputs.version }}-windows-unsigned-executables
+        path: |
+          doxygen-install/bin/doxygen.exe
+          doxygen-install/bin/doxyindexer.exe
+          doxygen-install/bin/doxysearch.cgi.exe
+          doxygen-install/bin/doxywizard.exe
+        retention-days: 1
+
+    - name: Submit executables for signing (Windows)
+      if: matrix.platform == 'windows'
+      id: sign-executables
+      uses: signpath/github-action-submit-signing-request@v1
+      with:
+        api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+        organization-id: ${{ env.SIGNPATH_ORGANIZATION_ID }}
+        project-slug: ${{ env.SIGNPATH_PROJECT_SLUG }}
+        artifact-configuration-slug: ${{ env.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
+        signing-policy-slug: ${{ env.SIGNPATH_SIGNING_POLICY_SLUG }}
+        github-artifact-id: ${{ steps.upload-unsigned-executables.outputs.artifact-id }}
+        wait-for-completion: true
+        output-artifact-directory: signed/executables
+
+    - name: Replace executables with signed ones (Windows)
+      if: matrix.platform == 'windows'
+      run: |
+        Copy-Item -Path 'signed\executables\*' -Destination 'doxygen-install\bin' -Force
+      shell: powershell
+
+    - name: Create installer (Windows)
+      if: matrix.platform == 'windows'
+      run: |
         Write-Host "Using version: '${{ steps.doxygen-version.outputs.version }}'"
         (Get-Content .\windows\doxygen.iss -Raw) -replace '\$VERSION','${{ steps.doxygen-version.outputs.version }}' | Set-Content -Encoding ASCII .\doxygen-versioned.iss
         # invoke the inno setup compiler
@@ -1367,6 +1430,35 @@ jobs:
           'R:\doxygen-install\bin\libclang.dll'
         )
         Compress-Archive -Path $doxygen_zip_files -DestinationPath 'R:\installer\doxygen-${{ steps.doxygen-version.outputs.version }}.windows.x64.bin.zip' -Force
+      shell: powershell
+
+    - name: Upload unsigned installer (Windows)
+      if: matrix.platform == 'windows'
+      id: upload-unsigned-installer
+      uses: actions/upload-artifact@v6
+      with:
+        name: doxygen-${{ steps.doxygen-version.outputs.version }}-windows-unsigned-installer
+        path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}-setup.exe
+        retention-days: 1
+
+    - name: Submit installer for signing (Windows)
+      if: matrix.platform == 'windows'
+      id: sign-installer
+      uses: signpath/github-action-submit-signing-request@v1
+      with:
+        api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+        organization-id: ${{ env.SIGNPATH_ORGANIZATION_ID }}
+        project-slug: ${{ env.SIGNPATH_PROJECT_SLUG }}
+        artifact-configuration-slug: ${{ env.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
+        signing-policy-slug: ${{ env.SIGNPATH_SIGNING_POLICY_SLUG }}
+        github-artifact-id: ${{ steps.upload-unsigned-installer.outputs.artifact-id }}
+        wait-for-completion: true
+        output-artifact-directory: signed/installer
+
+    - name: Replace installer with signed one (Windows)
+      if: matrix.platform == 'windows'
+      run: |
+        Copy-Item -Path 'signed\installer\doxygen-${{ steps.doxygen-version.outputs.version }}-setup.exe' -Destination 'installer\doxygen-${{ steps.doxygen-version.outputs.version }}-setup.exe' -Force
       shell: powershell
 
 
