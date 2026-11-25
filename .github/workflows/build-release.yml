@@ -1,14 +1,19 @@
 on:
   workflow_dispatch:
     inputs:
-      git_source_version:
-        description: 'Use latest tagged release or latest master?'
+      doxygen_source_version:
+        description: 'Use latest tagged release of Doxygen, or master branch?'
         required: true
         default: 'tagged'
         type: choice
         options:
           - 'tagged'
           - 'master'
+  pull_request:
+    branches:
+      - 'main'
+  schedule: # Add weekly scheduled run to keep caches warm
+    - cron: '0 6 * * 6'
 
 name: Create Doxygen Release
 
