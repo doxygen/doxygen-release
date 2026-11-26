@@ -71,7 +71,7 @@ jobs:
             llvm_version: 21.1.5
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
 #------------------------------------- setup Linux environment for LLVM
 
@@ -127,7 +127,7 @@ jobs:
 
     - name: Cache LLVM install
       id: cache-llvm-install
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: llvm-install
         key: llvm-install-${{ steps.llvm-version.outputs.tag }}-${{ matrix.os }}
@@ -253,7 +253,7 @@ jobs:
 #------------------------------------- upload LLVM artifacts
 
     - name: Upload LLVM static build
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: llvm-static-${{ steps.llvm-version.outputs.version }}-${{ matrix.os }}
         path: llvm-static-${{ steps.llvm-version.outputs.version }}-${{ matrix.os }}.${{ matrix.archive_format }}
@@ -293,7 +293,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
 #------------------------------------- setup Linux environment for Xapian
 
@@ -481,7 +481,7 @@ jobs:
 #------------------------------------- upload Xapian build artifacts
 
       - name: Upload Xapian static build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}
           path: xapian-static-${{ steps.xapian-version.outputs.version }}-${{ matrix.os }}.${{ matrix.archive_format }}
@@ -520,7 +520,7 @@ jobs:
             archive_format: tar.gz
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
 #------------------------------------- setup Linux environment for Qt6
 
@@ -598,7 +598,7 @@ jobs:
 
     - name: Cache Qt6 install
       id: cache-qt6-install
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: qt6-install
         key: qt6-install-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}
@@ -761,7 +761,7 @@ jobs:
 #------------------------------------- upload the Qt6 build artifacts
 
     - name: Upload Qt6 static build
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}
         path: qt6-static-${{ steps.qt6-version.outputs.version }}-${{ matrix.os }}.${{ matrix.archive_format }}
@@ -810,7 +810,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
 #------------------------------------- setup Linux environment
 
@@ -879,7 +879,7 @@ jobs:
 
     - name: Install MikTeX (Windows)
       if: matrix.platform == 'windows'
-      uses: nick-invision/retry@v3
+      uses: nick-invision/retry@v4
       with:
         timeout_minutes: 15
         max_attempts: 5
@@ -1072,7 +1072,7 @@ jobs:
 #------------------------------------- prepare libclang dependency
 #
     - name: Download LLVM artifacts
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@v8
       with:
         name: llvm-static-${{ matrix.llvm_versioN }}-${{ matrix.os }}
         path: llvm-artifact
@@ -1116,7 +1116,7 @@ jobs:
 #------------------------------------- prepare Qt dependency
 
     - name: Download Qt6 artifacts
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@v8
       with:
         name: qt6-static-${{ env.QT6_VERSION }}-${{ matrix.os }}
         path: qt6-artifact
@@ -1153,7 +1153,7 @@ jobs:
 #------------------------------------- prepare Xapian dependency
 
     - name: Download Xapian artifacts
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@v8
       with:
         name: xapian-static-${{ env.XAPIAN_VERSION }}-${{ matrix.os }}
         path: xapian-artifact
@@ -1352,7 +1352,7 @@ jobs:
     - name: Upload unsigned executables (Windows)
       if: matrix.platform == 'windows'
       id: upload-unsigned-executables
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: doxygen-${{ steps.doxygen-version.outputs.version }}-windows-unsigned-executables
         path: |
@@ -1365,7 +1365,7 @@ jobs:
     - name: Submit executables for signing (Windows)
       if: matrix.platform == 'windows'
       id: sign-executables
-      uses: signpath/github-action-submit-signing-request@v1
+      uses: signpath/github-action-submit-signing-request@v2
       with:
         api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
         organization-id: ${{ env.SIGNPATH_ORGANIZATION_ID }}
@@ -1412,7 +1412,7 @@ jobs:
     - name: Upload unsigned installer (Windows)
       if: matrix.platform == 'windows'
       id: upload-unsigned-installer
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: doxygen-${{ steps.doxygen-version.outputs.version }}-windows-unsigned-installer
         path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}-setup.exe
@@ -1421,7 +1421,7 @@ jobs:
     - name: Submit installer for signing (Windows)
       if: matrix.platform == 'windows'
       id: sign-installer
-      uses: signpath/github-action-submit-signing-request@v1
+      uses: signpath/github-action-submit-signing-request@v2
       with:
         api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
         organization-id: ${{ env.SIGNPATH_ORGANIZATION_ID }}
@@ -1592,56 +1592,56 @@ jobs:
 
     - name: Upload Doxygen build (Windows/setup.exe)
       if: matrix.platform == 'windows'
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: doxygen-${{ steps.doxygen-version.outputs.version }}-setup.exe
         path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}-setup.exe
 
     - name: Upload Doxygen build (Windows/doxygen-x64.zip)
       if: matrix.platform == 'windows'
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: doxygen-${{ steps.doxygen-version.outputs.version }}.windows.x64.bin.zip
         path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}.windows.x64.bin.zip
 
     - name: Upload Doxygen build (Windows/doxygen_manual.chm)
       if: matrix.platform == 'windows'
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: doxygen_manual-${{ steps.doxygen-version.outputs.version }}.chm.zip
         path: installer/doxygen_manual-${{ steps.doxygen-version.outputs.version }}.chm.zip
 
     - name: Upload Doxygen build (macOS/doxygen.dmg)
       if: matrix.platform == 'macos'
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg
         path: installer/Doxygen-${{ steps.doxygen-version.outputs.version }}-${{ matrix.cpu }}.dmg
 
     - name: Upload Doxygen build (macOS/doxygen-mac.zip)
       if: matrix.platform == 'macos'
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: doxygen-${{ steps.doxygen-version.outputs.version }}-mac-${{ matrix.cpu }}.zip
         path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}-mac-${{ matrix.cpu }}.zip
 
     - name: Upload Doxygen build (Linux/doxygen.src.tar.gz)
       if: matrix.platform == 'linux'
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: doxygen-${{ steps.doxygen-version.outputs.version }}.src.tar.gz
         path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}.src.tar.gz
 
     - name: Upload Doxygen build (Linux/doxygen.linux.bin.tar.gz)
       if: matrix.platform == 'linux'
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: doxygen-${{ steps.doxygen-version.outputs.version }}.linux.bin.tar.gz
         path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}.linux.bin.tar.gz
 
     - name: Upload Doxygen build (Linux/doxygen_manual.pdf.zip)
       if: matrix.platform == 'linux'
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: doxygen_manual-${{ steps.doxygen-version.outputs.version }}.pdf.zip
         path: installer/doxygen_manual-${{ steps.doxygen-version.outputs.version }}.pdf.zip
