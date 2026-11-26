@@ -1025,7 +1025,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         # use latest tagged version
-        if [ "${{ github.event.inputs.git_source_version }}" == "tagged" ]; then
+        if [ "${{ github.event.inputs.doxygen_source_version }}" == "tagged" ]; then
           set -euo pipefail
           echo "GITHUB_TOKEN present: ${GITHUB_TOKEN:+yes}"
           resp=$(curl -sS -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/doxygen/doxygen/tags" ) || true
@@ -1060,7 +1060,7 @@ jobs:
       run: |
         echo "Downloading Doxygen ${{ steps.doxygen-version.outputs.tag }}"
 
-        if [ "${{ github.event.inputs.git_source_version }}" == "tagged" ]; then
+        if [ "${{ github.event.inputs.doxygen_source_version }}" == "tagged" ]; then
           # download source for latest tagged release
           git clone --depth 1 --branch ${{ steps.doxygen-version.outputs.tag }} https://github.com/doxygen/doxygen.git
         else # value is "master"
