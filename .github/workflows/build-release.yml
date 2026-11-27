@@ -326,31 +326,11 @@ jobs:
 
       - name: Download zlib (Windows)
         if: matrix.platform == 'windows'
+        shell: bash
         run: |
-          $url = "https://zlib.net/zlib-${{ env.ZLIB_VERSION }}.tar.gz"
-          $output = "zlib.tgz"
-          $maxAttempts = 5
-          for ($i = 1; $i -le $maxAttempts; $i++) {
-            Write-Host "Attempt $i of $maxAttempts: downloading $url"
-            curl.exe -L --fail -o $output $url
-            if ($LASTEXITCODE -eq 0 -and (Test-Path $output)) {
-              $bytes = [System.IO.File]::ReadAllBytes($output)
-              if ($bytes.Length -ge 2 -and $bytes[0] -eq 0x1f -and $bytes[1] -eq 0x8b) {
-                Write-Host "Downloaded a valid gzip archive ($($bytes.Length) bytes)."
-                break
-              }
-              $hex = ($bytes[0..([Math]::Min(15, $bytes.Length - 1))] | ForEach-Object { '{0:x2}' -f $_ }) -join ' '
-              Write-Warning "Downloaded file is not a valid gzip archive (first bytes: $hex); likely an error page from the server."
-            } else {
-              Write-Warning "curl failed with exit code $LASTEXITCODE"
-            }
-            if ($i -eq $maxAttempts) {
-              Write-Error "Failed to download a valid zlib archive from $url after $maxAttempts attempts."
-              exit 1
-            }
-            Start-Sleep -Seconds (5 * $i)
-          }
-          tar zxvf $output
+          echo "Downloading zlib $ZLIB_VERSION..."
+          curl -fL --retry 3 -o zlib.tgz "https://zlib.net/zlib-$ZLIB_VERSION.tar.gz"
+          tar -xzf zlib.tgz
 
       - name: Build zlib (Windows)
         if: matrix.platform == 'windows'
@@ -1022,31 +1002,11 @@ jobs:
 
     - name: Download zlib (Windows)
       if: matrix.platform == 'windows'
+      shell: bash
       run: |
-        $url = "https://zlib.net/zlib-${{ env.ZLIB_VERSION }}.tar.gz"
-        $output = "zlib.tgz"
-        $maxAttempts = 5
-        for ($i = 1; $i -le $maxAttempts; $i++) {
-          Write-Host "Attempt $i of $maxAttempts: downloading $url"
-          curl.exe -L --fail -o $output $url
-          if ($LASTEXITCODE -eq 0 -and (Test-Path $output)) {
-            $bytes = [System.IO.File]::ReadAllBytes($output)
-            if ($bytes.Length -ge 2 -and $bytes[0] -eq 0x1f -and $bytes[1] -eq 0x8b) {
-              Write-Host "Downloaded a valid gzip archive ($($bytes.Length) bytes)."
-              break
-            }
-            $hex = ($bytes[0..([Math]::Min(15, $bytes.Length - 1))] | ForEach-Object { '{0:x2}' -f $_ }) -join ' '
-            Write-Warning "Downloaded file is not a valid gzip archive (first bytes: $hex); likely an error page from the server."
-          } else {
-            Write-Warning "curl failed with exit code $LASTEXITCODE"
-          }
-          if ($i -eq $maxAttempts) {
-            Write-Error "Failed to download a valid zlib archive from $url after $maxAttempts attempts."
-            exit 1
-          }
-          Start-Sleep -Seconds (5 * $i)
-        }
-        tar zxvf $output
+        echo "Downloading zlib $ZLIB_VERSION..."
+        curl -fL --retry 3 -o zlib.tgz "https://zlib.net/zlib-$ZLIB_VERSION.tar.gz"
+        tar -xzf zlib.tgz
 
     - name: Build zlib (Windows)
       if: matrix.platform == 'windows'
