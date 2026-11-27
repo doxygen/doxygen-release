@@ -56,19 +56,19 @@ jobs:
             platform: windows
             extension: .exe
             archive_format: zip
-            llvm_version: 21.1.5
+            llvm_version: 21.1.6
           - os: macos-15
             cpu: arm
             platform: macos
             extension: ""
             archive_format: tar.gz
-            llvm_version: 21.1.5
+            llvm_version: 21.1.6
           - os: macos-15-intel
             cpu: intel
             platform: macos
             extension: ""
             archive_format: tar.gz
-            llvm_version: 21.1.5
+            llvm_version: 21.1.6
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
@@ -794,19 +794,19 @@ jobs:
             platform: windows
             extension: .exe
             archive_format: zip
-            llvm_version: 21.1.5
+            llvm_version: 21.1.6
           - os: macos-15
             cpu: arm
             platform: macos
             extension: ""
             archive_format: tar.gz
-            llvm_version: 21.1.5
+            llvm_version: 21.1.6
           - os: macos-15-intel
             cpu: intel
             platform: macos
             extension: ""
             archive_format: tar.gz
-            llvm_version: 21.1.5
+            llvm_version: 21.1.6
 
     steps:
     - name: Checkout repository
