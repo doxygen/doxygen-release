@@ -17,8 +17,8 @@ permissions:
 
 env:
   BUILD_TYPE: Release
-  XAPIAN_VERSION: 1.4.29
-  QT6_VERSION: 6.10.0
+  XAPIAN_VERSION: 1.4.32
+  QT6_VERSION: 6.10.3
   ZLIB_VERSION: 1.4
   # SignPath (https://signpath.io) is used to code sign the Windows executables.
   # These values identify the SignPath organization/project/artifact-configuration
@@ -56,19 +56,19 @@ jobs:
             platform: windows
             extension: .exe
             archive_format: zip
-            llvm_version: 21.1.5
+            llvm_version: 21.1.8
           - os: macos-15
             cpu: arm
             platform: macos
             extension: ""
             archive_format: tar.gz
-            llvm_version: 21.1.5
+            llvm_version: 21.1.8
           - os: macos-15-intel
             cpu: intel
             platform: macos
             extension: ""
             archive_format: tar.gz
-            llvm_version: 21.1.5
+            llvm_version: 21.1.8
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
@@ -816,19 +816,19 @@ jobs:
             platform: windows
             extension: .exe
             archive_format: zip
-            llvm_version: 21.1.5
+            llvm_version: 21.1.8
           - os: macos-15
             cpu: arm
             platform: macos
             extension: ""
             archive_format: tar.gz
-            llvm_version: 21.1.5
+            llvm_version: 21.1.8
           - os: macos-15-intel
             cpu: intel
             platform: macos
             extension: ""
             archive_format: tar.gz
-            llvm_version: 21.1.5
+            llvm_version: 21.1.8
 
     steps:
     - name: Checkout repository
