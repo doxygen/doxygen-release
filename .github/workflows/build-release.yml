@@ -51,7 +51,7 @@ jobs:
             extension: ""
             archive_format: tar.gz
             llvm_version: 15.0.7
-          - os: windows-latest
+          - os: windows-2025
             cpu: intel
             platform: windows
             extension: .exe
@@ -275,7 +275,7 @@ jobs:
             platform: linux
             extension: ""
             archive_format: tar.gz
-          - os: windows-latest
+          - os: windows-2025
             cpu: intel
             platform: windows
             extension: .exe
@@ -503,7 +503,7 @@ jobs:
             platform: linux
             extension: ""
             archive_format: tar.gz
-          - os: windows-latest
+          - os: windows-2025
             cpu: intel
             platform: windows
             extension: .exe
@@ -789,7 +789,7 @@ jobs:
             extension: ""
             archive_format: tar.gz
             llvm_version: 15.0.7
-          - os: windows-latest
+          - os: windows-2025
             cpu: intel
             platform: windows
             extension: .exe
