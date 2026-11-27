@@ -1005,7 +1005,7 @@ jobs:
         tar zxvf zlib.tgz
 
         # dump first 16 bytes for debugging
-        $bytes = Get-Content -Path 'zlib.tgz' -Encoding Byte -TotalCount 16
+        $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path 'zlib.tgz'))[0..15]
         $hex = ($bytes | ForEach-Object { '{0:x2}' -f $_ }) -join ' '
         $ascii = -join ($bytes | ForEach-Object { if ($_ -ge 32 -and $_ -le 126) { [char]$_ } else { '.' } })
         '{0,-48} {1}' -f $hex, $ascii
