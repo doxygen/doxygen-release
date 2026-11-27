@@ -1004,6 +1004,12 @@ jobs:
         curl -L -o zlib.tgz https://zlib.net/zlib-${{ env.ZLIB_VERSION }}.tar.gz
         tar zxvf zlib.tgz
 
+        # dump first 16 bytes for debugging
+        $bytes = Get-Content -Path 'zlib.tgz' -Encoding Byte -TotalCount 16
+        $hex = ($bytes | ForEach-Object { '{0:x2}' -f $_ }) -join ' '
+        $ascii = -join ($bytes | ForEach-Object { if ($_ -ge 32 -and $_ -le 126) { [char]$_ } else { '.' } })
+        '{0,-48} {1}' -f $hex, $ascii
+
     - name: Build zlib (Windows)
       if: matrix.platform == 'windows'
       shell: cmd
