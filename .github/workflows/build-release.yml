@@ -437,6 +437,7 @@ jobs:
           export CXX="./compile cl -nologo"
           export CXXFLAGS="-EHsc"
           export AR="lib"
+          export RANLIB=":"
           export LD="link"
           export NM="dumpbin"
           export CPPFLAGS="-I../../zlib-${{ env.ZLIB_VERSION }}"
