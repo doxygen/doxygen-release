@@ -1409,7 +1409,7 @@ jobs:
     - name: Submit executables for signing (Windows)
       if: matrix.platform == 'windows'
       id: sign-executables
-      uses: signpath/github-action-submit-signing-request@v2
+      uses: signpath/github-action-submit-signing-request@v3
       with:
         api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
         organization-id: ${{ env.SIGNPATH_ORGANIZATION_ID }}
@@ -1465,7 +1465,7 @@ jobs:
     - name: Submit installer for signing (Windows)
       if: matrix.platform == 'windows'
       id: sign-installer
-      uses: signpath/github-action-submit-signing-request@v2
+      uses: signpath/github-action-submit-signing-request@v3
       with:
         api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
         organization-id: ${{ env.SIGNPATH_ORGANIZATION_ID }}
