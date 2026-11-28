@@ -543,14 +543,15 @@ jobs:
             extension: .exe
             archive_format: zip
             msvc_arch: x64
-            qt_platform: win32-msvc
+            qt_platform_args: -platform win32-msvc
           - os: windows-11-arm
             cpu: arm64
             platform: windows
             extension: .exe
             archive_format: zip
             msvc_arch: arm64
-            qt_platform: win32-arm64-msvc
+            # Let Qt detect the native ARM64 mkspec; explicitly passing it enables cross-compilation.
+            qt_platform_args: ""
           - os: macos-15
             cpu: arm
             platform: macos
@@ -695,8 +696,10 @@ jobs:
     - name: Configure CMake for Qt6 Base (Windows)
       if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform == 'windows'
       run: |
+        rem Ensure CMake detects the native host even when tools run under x64 emulation.
+        if "${{ matrix.cpu }}" == "arm64" set "PROCESSOR_ARCHITEW6432=ARM64"
         cd qt6-source\qtbase
-        call configure.bat -static -static-runtime -release -prefix ${{ github.workspace }}\qt6-install -platform ${{ matrix.qt_platform }} -qt-zlib -qt-pcre -qt-libpng -qt-libjpeg -qt-freetype -opengl desktop -sql-sqlite -sql-odbc -no-openssl -opensource -confirm-license -make libs -nomake tools -nomake tests
+        call configure.bat -static -static-runtime -release -prefix ${{ github.workspace }}\qt6-install ${{ matrix.qt_platform_args }} -qt-zlib -qt-pcre -qt-libpng -qt-libjpeg -qt-freetype -opengl desktop -sql-sqlite -sql-odbc -no-openssl -opensource -confirm-license -make libs -nomake tools -nomake tests
         cmake --build . --parallel
         cmake --install .
       shell: cmd
