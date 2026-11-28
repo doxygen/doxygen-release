@@ -64,6 +64,14 @@ jobs:
             extension: .exe
             archive_format: zip
             llvm_version: 21.1.5
+            msvc_arch: x64
+          - os: windows-11-arm
+            cpu: arm64
+            platform: windows
+            extension: .exe
+            archive_format: zip
+            llvm_version: 21.1.5
+            msvc_arch: arm64
           - os: macos-15
             cpu: arm
             platform: macos
@@ -193,6 +201,8 @@ jobs:
     - name: Set up MSVC dev command prompt (Windows)
       if: matrix.platform == 'windows'
       uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.msvc_arch }}
 
     - name: Configure CMake for LLVM (Windows)
       if: steps.cache-llvm-install.outputs.cache-hit != 'true' && matrix.platform == 'windows'
@@ -292,6 +302,13 @@ jobs:
             platform: windows
             extension: .exe
             archive_format: zip
+            msvc_arch: x64
+          - os: windows-11-arm
+            cpu: arm64
+            platform: windows
+            extension: .exe
+            archive_format: zip
+            msvc_arch: arm64
           - os: macos-15
             cpu: arm
             platform: macos
@@ -335,6 +352,8 @@ jobs:
       - name: Set up MSVC dev command prompt (Windows)
         if: matrix.platform == 'windows'
         uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc_arch }}
 
       - name: Build zlib (Windows)
         if: matrix.platform == 'windows'
@@ -522,6 +541,15 @@ jobs:
             platform: windows
             extension: .exe
             archive_format: zip
+            msvc_arch: x64
+            qt_platform: win32-msvc
+          - os: windows-11-arm
+            cpu: arm64
+            platform: windows
+            extension: .exe
+            archive_format: zip
+            msvc_arch: arm64
+            qt_platform: win32-arm64-msvc
           - os: macos-15
             cpu: arm
             platform: macos
@@ -586,6 +614,8 @@ jobs:
     - name: Set up MSVC dev command prompt (Windows)
       if: matrix.platform == 'windows'
       uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.msvc_arch }}
 
 #------------------------------------- setup macOS environment for Qt6
 
@@ -665,7 +695,7 @@ jobs:
       if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform == 'windows'
       run: |
         cd qt6-source\qtbase
-        call configure.bat -static -static-runtime -release -prefix ${{ github.workspace }}\qt6-install -platform win32-msvc -qt-zlib -qt-pcre -qt-libpng -qt-libjpeg -qt-freetype -opengl desktop -sql-sqlite -sql-odbc -no-openssl -opensource -confirm-license -make libs -nomake tools -nomake tests
+        call configure.bat -static -static-runtime -release -prefix ${{ github.workspace }}\qt6-install -platform ${{ matrix.qt_platform }} -qt-zlib -qt-pcre -qt-libpng -qt-libjpeg -qt-freetype -opengl desktop -sql-sqlite -sql-odbc -no-openssl -opensource -confirm-license -make libs -nomake tools -nomake tests
         cmake --build . --parallel
         cmake --install .
       shell: cmd
@@ -816,6 +846,17 @@ jobs:
             extension: .exe
             archive_format: zip
             llvm_version: 21.1.5
+            msvc_arch: x64
+            package_arch: x64
+          - os: windows-11-arm
+            cpu: arm64
+            platform: windows
+            extension: .exe
+            archive_format: zip
+            llvm_version: 21.1.5
+            msvc_arch: arm64
+            package_arch: arm64
+            setup_suffix: -arm64
           - os: macos-15
             cpu: arm
             platform: macos
@@ -977,6 +1018,8 @@ jobs:
     - name: Set up MSVC dev command prompt (Windows)
       if: matrix.platform == 'windows'
       uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: ${{ matrix.msvc_arch }}
 
 #------------------------------------- install HtmlHelp compiler for Windows
 
@@ -1351,9 +1394,12 @@ jobs:
         subst R: ${{ github.workspace }}
         mkdir installer
         copy R:\llvm-install\bin\libclang.dll ${{ github.workspace }}\doxygen-install\bin
-        editbin R:\doxygen-install\bin\doxygen.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
-        editbin R:\doxygen-install\bin\doxyindexer.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
-        editbin R:\doxygen-install\bin\doxysearch.cgi.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
+        # the minimum OS version override only applies to the x64 executables
+        if ('${{ matrix.cpu }}' -eq 'intel') {
+          editbin R:\doxygen-install\bin\doxygen.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
+          editbin R:\doxygen-install\bin\doxyindexer.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
+          editbin R:\doxygen-install\bin\doxysearch.cgi.exe /SUBSYSTEM:CONSOLE,6.00 /OSVERSION:5.1
+        }
       shell: powershell
 
 #------------------------------------- sign the Windows executables via SignPath
@@ -1370,7 +1416,7 @@ jobs:
       id: upload-unsigned-executables
       uses: actions/upload-artifact@v7
       with:
-        name: doxygen-${{ steps.doxygen-version.outputs.version }}-windows-unsigned-executables
+        name: doxygen-${{ steps.doxygen-version.outputs.version }}-windows-unsigned-executables-${{ matrix.cpu }}
         path: |
           doxygen-install/bin/doxygen.exe
           doxygen-install/bin/doxyindexer.exe
@@ -1409,7 +1455,9 @@ jobs:
           Write-Error "ISCC.exe not found. Checked: $($possible -join '; ') and PATH."
           exit 1
         }
-        & iscc 'doxygen-versioned.iss'
+        $isccArgs = @()
+        if ('${{ matrix.cpu }}' -eq 'arm64') { $isccArgs += '/DARM64' }
+        & iscc @isccArgs 'doxygen-versioned.iss'
         if ($LASTEXITCODE -ne 0) { Write-Error "ISCC failed with exit code $LASTEXITCODE"; exit $LASTEXITCODE }
         $doxygen_chm_files = @(
           'R:\doxygen-install\share\doc\packages\doxygen\doxygen_manual.chm'
@@ -1422,7 +1470,7 @@ jobs:
           'R:\doxygen-install\bin\doxygen.exe'
           'R:\doxygen-install\bin\libclang.dll'
         )
-        Compress-Archive -Path $doxygen_zip_files -DestinationPath 'R:\installer\doxygen-${{ steps.doxygen-version.outputs.version }}.windows.x64.bin.zip' -Force
+        Compress-Archive -Path $doxygen_zip_files -DestinationPath 'R:\installer\doxygen-${{ steps.doxygen-version.outputs.version }}.windows.${{ matrix.package_arch }}.bin.zip' -Force
       shell: powershell
 
     - name: Upload unsigned installer (Windows)
@@ -1430,8 +1478,8 @@ jobs:
       id: upload-unsigned-installer
       uses: actions/upload-artifact@v7
       with:
-        name: doxygen-${{ steps.doxygen-version.outputs.version }}-windows-unsigned-installer
-        path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}-setup.exe
+        name: doxygen-${{ steps.doxygen-version.outputs.version }}-windows-unsigned-installer-${{ matrix.cpu }}
+        path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}${{ matrix.setup_suffix }}-setup.exe
         retention-days: 1
 
     - name: Submit installer for signing (Windows)
@@ -1451,7 +1499,7 @@ jobs:
     - name: Replace installer with signed one (Windows)
       if: matrix.platform == 'windows'
       run: |
-        Copy-Item -Path 'signed\installer\doxygen-${{ steps.doxygen-version.outputs.version }}-setup.exe' -Destination 'installer\doxygen-${{ steps.doxygen-version.outputs.version }}-setup.exe' -Force
+        Copy-Item -Path 'signed\installer\doxygen-${{ steps.doxygen-version.outputs.version }}${{ matrix.setup_suffix }}-setup.exe' -Destination 'installer\doxygen-${{ steps.doxygen-version.outputs.version }}${{ matrix.setup_suffix }}-setup.exe' -Force
       shell: powershell
 
 
@@ -1610,18 +1658,18 @@ jobs:
       if: matrix.platform == 'windows'
       uses: actions/upload-artifact@v7
       with:
-        name: doxygen-${{ steps.doxygen-version.outputs.version }}-setup.exe
-        path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}-setup.exe
+        name: doxygen-${{ steps.doxygen-version.outputs.version }}${{ matrix.setup_suffix }}-setup.exe
+        path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}${{ matrix.setup_suffix }}-setup.exe
 
     - name: Upload Doxygen build (Windows/doxygen-x64.zip)
       if: matrix.platform == 'windows'
       uses: actions/upload-artifact@v7
       with:
-        name: doxygen-${{ steps.doxygen-version.outputs.version }}.windows.x64.bin.zip
-        path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}.windows.x64.bin.zip
+        name: doxygen-${{ steps.doxygen-version.outputs.version }}.windows.${{ matrix.package_arch }}.bin.zip
+        path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}.windows.${{ matrix.package_arch }}.bin.zip
 
     - name: Upload Doxygen build (Windows/doxygen_manual.chm)
-      if: matrix.platform == 'windows'
+      if: matrix.platform == 'windows' && matrix.cpu == 'intel'
       uses: actions/upload-artifact@v7
       with:
         name: doxygen_manual-${{ steps.doxygen-version.outputs.version }}.chm.zip

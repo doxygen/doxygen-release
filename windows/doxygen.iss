@@ -3,6 +3,7 @@
 ; r:\doxygen should point to the source directory
 ; r:\doxygen-install should point to the installation directory
 ; $VERSION is a placeholder that needs to be replaced
+; define ARM64 (iscc /DARM64) to create the installer for Windows on Arm
 
 [Setup]
 ; Source and Output directories for the compiler:
@@ -19,7 +20,11 @@ AppSupportURL=http://www.doxygen.org
 AppUpdatesURL=http://www.doxygen.org
 AppVersion=$VERSION
 ; Configuration of the installer executable:
+#ifdef ARM64
+OutputBaseFilename=doxygen-$VERSION-arm64-setup
+#else
 OutputBaseFilename=doxygen-$VERSION-setup
+#endif
 Compression=bzip/9
 LicenseFile=r:\doxygen\LICENSE
 InfoAfterFile=r:\doxygen\README.md
@@ -31,7 +36,12 @@ AllowNoIcons=yes
 ; AlwaysCreateUninstallIcon=yes
 UninstallFilesDir={app}\system
 ChangesEnvironment=true
+#ifdef ARM64
+ArchitecturesAllowed=arm64
+ArchitecturesInstallIn64BitMode=arm64
+#else
 ArchitecturesInstallIn64BitMode=x64compatible
+#endif
 
 [Types]
 ; Defines which types of installation are possible
