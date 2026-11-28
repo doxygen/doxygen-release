@@ -331,7 +331,7 @@ jobs:
           $output = "zlib.tgz"
           $maxAttempts = 5
           for ($i = 1; $i -le $maxAttempts; $i++) {
-            Write-Host "Attempt $i of $maxAttempts: downloading $url"
+            Write-Host "Attempt $i of ${maxAttempts}: downloading $url"
             curl.exe -L --fail -o $output $url
             if ($LASTEXITCODE -eq 0 -and (Test-Path $output)) {
               $bytes = [System.IO.File]::ReadAllBytes($output)
@@ -1027,7 +1027,7 @@ jobs:
         $output = "zlib.tgz"
         $maxAttempts = 5
         for ($i = 1; $i -le $maxAttempts; $i++) {
-          Write-Host "Attempt $i of $maxAttempts: downloading $url"
+          Write-Host "Attempt $i of ${maxAttempts}: downloading $url"
           curl.exe -L --fail -o $output $url
           if ($LASTEXITCODE -eq 0 -and (Test-Path $output)) {
             $bytes = [System.IO.File]::ReadAllBytes($output)
