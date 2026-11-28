@@ -51,6 +51,13 @@ jobs:
             extension: ""
             archive_format: tar.gz
             llvm_version: 15.0.7
+          - os: ubuntu-22.04-arm
+            cpu: arm64
+            platform: linux
+            extension: ""
+            archive_format: tar.gz
+            llvm_version: 15.0.7
+            package_suffix: .arm64
           - os: windows-latest
             cpu: intel
             platform: windows
@@ -272,6 +279,11 @@ jobs:
         include:
           - os: ubuntu-22.04
             cpu: intel
+            platform: linux
+            extension: ""
+            archive_format: tar.gz
+          - os: ubuntu-22.04-arm
+            cpu: arm64
             platform: linux
             extension: ""
             archive_format: tar.gz
@@ -498,6 +510,13 @@ jobs:
             platform: linux
             extension: ""
             archive_format: tar.gz
+            qt_platform: linux-g++-64
+          - os: ubuntu-22.04-arm
+            cpu: arm64
+            platform: linux
+            extension: ""
+            archive_format: tar.gz
+            qt_platform: linux-g++
           - os: windows-latest
             cpu: intel
             platform: windows
@@ -655,7 +674,7 @@ jobs:
       if: steps.cache-qt6-install.outputs.cache-hit != 'true' && matrix.platform == 'linux'
       run: |
         cd qt6-source/qtbase
-        ./configure -static -static-runtime -release -prefix ${{ github.workspace }}/qt6-install -platform linux-g++-64 -qt-zlib -qt-pcre -qt-libpng -qt-libjpeg -qt-freetype -opengl desktop -sql-sqlite -no-openssl -opensource -confirm-license -make libs -nomake tools -nomake tests
+        ./configure -static -static-runtime -release -prefix ${{ github.workspace }}/qt6-install -platform ${{ matrix.qt_platform }} -qt-zlib -qt-pcre -qt-libpng -qt-libjpeg -qt-freetype -opengl desktop -sql-sqlite -no-openssl -opensource -confirm-license -make libs -nomake tools -nomake tests
         cmake --build . --parallel
         cmake --install .
       shell: bash
@@ -784,6 +803,13 @@ jobs:
             extension: ""
             archive_format: tar.gz
             llvm_version: 15.0.7
+          - os: ubuntu-22.04-arm
+            cpu: arm64
+            platform: linux
+            extension: ""
+            archive_format: tar.gz
+            llvm_version: 15.0.7
+            package_suffix: .arm64
           - os: windows-latest
             cpu: intel
             platform: windows
@@ -1184,7 +1210,7 @@ jobs:
       run: |
         mkdir -p doxygen/build
         cd doxygen/build
-        UUID_FLAG="-DUUID_LIB=/lib/x86_64-linux-gnu/libuuid.a"
+        UUID_FLAG="-DUUID_LIB=/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/libuuid.a"
         echo "UUID_FLAG=$UUID_FLAG"
         cmake .. -G "Unix Makefiles" \
           -DCMAKE_BUILD_TYPE="${{ env.BUILD_TYPE }}" \
@@ -1575,7 +1601,7 @@ jobs:
         cp doxygen/build/bin/doxywizard $DESTDIR/bin
         cp doxygen/build/man/*.1 $DESTDIR/man/man1
         gzip $DESTDIR/man/man1/*
-        tar -C package -z -c -v -f installer/doxygen-$VERSION.linux.bin.tar.gz doxygen-$VERSION
+        tar -C package -z -c -v -f installer/doxygen-$VERSION.linux${{ matrix.package_suffix }}.bin.tar.gz doxygen-$VERSION
       shell: bash
 
 #------------------------------------- upload individual artifacts
@@ -1616,7 +1642,7 @@ jobs:
         path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}-mac-${{ matrix.cpu }}.zip
 
     - name: Upload Doxygen build (Linux/doxygen.src.tar.gz)
-      if: matrix.platform == 'linux'
+      if: matrix.platform == 'linux' && matrix.cpu == 'intel'
       uses: actions/upload-artifact@v7
       with:
         name: doxygen-${{ steps.doxygen-version.outputs.version }}.src.tar.gz
@@ -1626,11 +1652,11 @@ jobs:
       if: matrix.platform == 'linux'
       uses: actions/upload-artifact@v7
       with:
-        name: doxygen-${{ steps.doxygen-version.outputs.version }}.linux.bin.tar.gz
-        path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}.linux.bin.tar.gz
+        name: doxygen-${{ steps.doxygen-version.outputs.version }}.linux${{ matrix.package_suffix }}.bin.tar.gz
+        path: installer/doxygen-${{ steps.doxygen-version.outputs.version }}.linux${{ matrix.package_suffix }}.bin.tar.gz
 
     - name: Upload Doxygen build (Linux/doxygen_manual.pdf.zip)
-      if: matrix.platform == 'linux'
+      if: matrix.platform == 'linux' && matrix.cpu == 'intel'
       uses: actions/upload-artifact@v7
       with:
         name: doxygen_manual-${{ steps.doxygen-version.outputs.version }}.pdf.zip
